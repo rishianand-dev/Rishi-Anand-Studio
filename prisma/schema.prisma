@@ -1,0 +1,98 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  description     String
+  longDescription String?
+  category        String   @default("Full Stack")
+  tags            String[]
+  featured        Boolean  @default(false)
+  imageUrl        String
+  demoUrl         String?
+  githubUrl       String?
+  stars           Int      @default(0)
+  metrics         String?
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  role        String
+  company     String
+  period      String
+  location    String
+  description String
+  skills      String[]
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Education {
+  id          String   @id @default(cuid())
+  degree      String
+  institution String
+  period      String
+  location    String?
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  category  String   @default("Frontend") // Frontend, Backend, Practices, Tools
+  name      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  subject       String?
+  message       String
+  attachmentUrl String?
+  read          Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model Profile {
+  id               String   @id @default("default-profile")
+  name             String   @default("Alex Miller")
+  role             String   @default("SOFTWARE ENGINEER · BASED IN NEW YORK")
+  location         String   @default("New York, NY")
+  headline         String   @default("I build digital products that feel effortless.")
+  subheadline      String   @default("Product-minded engineer crafting fast, thoughtful experiences at the intersection of design and technology.")
+  availableForWork Boolean  @default(true)
+  avatarUrl        String?
+  resumeUrl        String?  @default("/resume.pdf")
+  githubUrl        String?  @default("https://github.com")
+  linkedinUrl      String?  @default("https://linkedin.com")
+  twitterUrl       String?  @default("https://twitter.com")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model SeoSettings {
+  id              String   @id @default("default-seo")
+  metaTitle       String   @default("Alex Miller — Liquid Glass Engineer Portfolio")
+  metaDescription String   @default("Product-minded software engineer crafting fast, thoughtful digital experiences at the intersection of design and technology.")
+  keywords        String   @default("Software Engineer, Full Stack, Next.js, TypeScript, PostgreSQL, WebGL, Liquid Glass")
+  ogImageUrl      String?  @default("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop")
+  canonicalUrl    String?  @default("https://alexmiller.dev")
+  twitterHandle   String?  @default("@alexmiller")
+  robots          String   @default("index, follow")
+  updatedAt       DateTime @updatedAt
+}

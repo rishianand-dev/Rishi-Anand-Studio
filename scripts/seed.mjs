@@ -1,0 +1,192 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+const projects = [
+  {
+    title: 'Aura Cloud — Real-Time Spatial Canvas',
+    slug: 'aura-cloud',
+    description: 'Ultra-low latency infinite canvas built with WebGL shaders, CRDTs, and distributed edge workers.',
+    longDescription: 'A collaborative canvas workspace designed for real-time multiplayer diagramming and visual thinking. Built using custom WebGL rendering pipelines, WebSocket synchronization with conflict-free replicated data types (CRDTs), and persistent edge caching for sub-50ms responsiveness.',
+    category: 'Full Stack',
+    tags: ['Next.js', 'TypeScript', 'WebGL', 'PostgreSQL', 'WebSockets', 'Tailwind'],
+    featured: true,
+    imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+    demoUrl: 'https://example.com/aura',
+    githubUrl: 'https://github.com/example/aura-cloud',
+    stars: 342,
+    metrics: '60 FPS Rendering · 45ms P99 Latency',
+    order: 1,
+  },
+  {
+    title: 'Synthetix — Generative Audio Engine',
+    slug: 'synthetix',
+    description: 'Browser-based parametric synthesizer and sound visualizer powered by Web Audio API and WebAssembly.',
+    longDescription: 'A modular audio synthesis workstation running completely client-side in the browser. Incorporates custom C++ DSP audio nodes compiled to WebAssembly via Emscripten, real-time FFT frequency spectrum visualization, and cloud preset sharing via Firebase.',
+    category: 'AI / Creative',
+    tags: ['React', 'TypeScript', 'Web Audio API', 'Wasm', 'Zustand', 'Firebase'],
+    featured: true,
+    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop',
+    demoUrl: 'https://example.com/synthetix',
+    githubUrl: 'https://github.com/example/synthetix',
+    stars: 520,
+    metrics: '128-Voice Polyphony · Zero Buffer Underruns',
+    order: 2,
+  },
+  {
+    title: 'Vortex DB — High-Throughput Stream Processor',
+    slug: 'vortex-db',
+    description: 'Distributed event processing pipeline capable of ingesting and indexing 250k events/sec with PostgreSQL storage.',
+    longDescription: 'An enterprise telemetry streaming engine engineered to ingest, aggregate, and materialize time-series event metrics at scale. Implements partitioned PostgreSQL WAL streaming, memory-bounded queuing, and automated backpressure protocols.',
+    category: 'Distributed Systems',
+    tags: ['PostgreSQL', 'Go', 'TypeScript', 'Kafka', 'Docker', 'Next.js'],
+    featured: true,
+    imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1200&auto=format&fit=crop',
+    demoUrl: 'https://example.com/vortex',
+    githubUrl: 'https://github.com/example/vortex-db',
+    stars: 819,
+    metrics: '250,000 req/sec · 99.999% Durability',
+    order: 3,
+  },
+  {
+    title: 'Prism Glass UI — Micro-interactions Design System',
+    slug: 'prism-ui',
+    description: 'An open-source Liquid Glass component architecture with dynamic optical blurs and physics-based spring gestures.',
+    longDescription: 'A cutting-edge UI library celebrating translucent glass interfaces, refractive borders, and haptic spring animations. Optimized for GPU hardware acceleration with composited layers and zero layout jank.',
+    category: 'Frontend',
+    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Zustand'],
+    featured: false,
+    imageUrl: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop',
+    demoUrl: 'https://example.com/prism',
+    githubUrl: 'https://github.com/example/prism-ui',
+    stars: 1240,
+    metrics: '15k+ Weekly Downloads · 100% Lighthouse Polish',
+    order: 4,
+  },
+];
+
+const experiences = [
+  {
+    role: 'Senior Staff Frontend Engineer',
+    company: 'Linear Labs / Craft Systems',
+    period: '2023 — Present',
+    location: 'New York, NY',
+    description: 'Leading interface architecture for next-gen collaborative tools. Designed the liquid interaction engine, reduced bundle payload by 42%, and spearheaded offline-first synchronization.',
+    skills: ['Next.js', 'TypeScript', 'PostgreSQL', 'Zustand', 'Performance', 'WebGL'],
+    order: 1,
+  },
+  {
+    role: 'Founding Engineer & Tech Lead',
+    company: 'HyperScale AI',
+    period: '2021 — 2023',
+    location: 'San Francisco, CA (Remote)',
+    description: 'Architected full-stack distributed platform from seed to Series A. Implemented real-time inference streaming pipelines, telemetry dashboards, and multi-tenant PostgreSQL clusters.',
+    skills: ['TypeScript', 'Node.js', 'PostgreSQL', 'Firebase', 'Kafka', 'React'],
+    order: 2,
+  },
+  {
+    role: 'Software Engineer',
+    company: 'Stripe Ecosystem Partner',
+    period: '2019 — 2021',
+    location: 'New York, NY',
+    description: 'Built high-converting merchant checkout flows, custom payment widget SDKs, and webhook ingestion systems with 99.99% availability.',
+    skills: ['JavaScript', 'React', 'REST APIs', 'PostgreSQL', 'Docker'],
+    order: 3,
+  },
+];
+
+const educations = [
+  {
+    degree: 'B.S. in Computer Science',
+    institution: 'Columbia University',
+    period: '2015 — 2019',
+    location: 'New York, NY',
+    description: 'Concentrations in Distributed Systems and Computer Graphics. Dean’s Honor List.',
+    order: 1,
+  },
+];
+
+const skills = [
+  { category: 'Frontend', name: 'Next.js 14', order: 1 },
+  { category: 'Frontend', name: 'React 18', order: 2 },
+  { category: 'Frontend', name: 'TypeScript', order: 3 },
+  { category: 'Frontend', name: 'Tailwind CSS', order: 4 },
+  { category: 'Frontend', name: 'WebGL / Shaders', order: 5 },
+  { category: 'Frontend', name: 'Zustand', order: 6 },
+  { category: 'Frontend', name: 'Framer Motion', order: 7 },
+
+  { category: 'Backend', name: 'Node.js', order: 8 },
+  { category: 'Backend', name: 'PostgreSQL', order: 9 },
+  { category: 'Backend', name: 'Prisma ORM', order: 10 },
+  { category: 'Backend', name: 'Firebase Storage', order: 11 },
+  { category: 'Backend', name: 'WebSockets', order: 12 },
+  { category: 'Backend', name: 'Redis', order: 13 },
+  { category: 'Backend', name: 'Docker', order: 14 },
+
+  { category: 'Practices', name: 'Design Systems', order: 15 },
+  { category: 'Practices', name: 'Performance Profiling', order: 16 },
+  { category: 'Practices', name: 'REST & GraphQL', order: 17 },
+  { category: 'Practices', name: 'Micro-Interactions', order: 18 },
+  { category: 'Practices', name: 'CI/CD Pipelines', order: 19 },
+];
+
+async function main() {
+  console.log('Connecting and seeding Neon Cloud PostgreSQL...');
+  try {
+    for (const p of projects) {
+      await prisma.project.upsert({
+        where: { slug: p.slug },
+        update: p,
+        create: p,
+      });
+    }
+
+    // Clean existing exps to avoid duplicates on re-seed
+    const countExp = await prisma.experience.count();
+    if (countExp === 0) {
+      for (const exp of experiences) {
+        await prisma.experience.create({ data: exp });
+      }
+    }
+
+    const countEdu = await prisma.education.count();
+    if (countEdu === 0) {
+      for (const edu of educations) {
+        await prisma.education.create({ data: edu });
+      }
+    }
+
+    const countSkills = await prisma.skill.count();
+    if (countSkills === 0) {
+      for (const sk of skills) {
+        await prisma.skill.create({ data: sk });
+      }
+    }
+
+    await prisma.profile.upsert({
+      where: { id: 'default-profile' },
+      update: {},
+      create: {
+        id: 'default-profile',
+        name: 'Alex Miller',
+        role: 'SOFTWARE ENGINEER · BASED IN NEW YORK',
+        location: 'New York, NY',
+        headline: 'I build digital products that feel effortless.',
+        subheadline: 'Product-minded engineer crafting fast, thoughtful experiences at the intersection of design and technology.',
+        availableForWork: true,
+        resumeUrl: '/resume.pdf',
+        githubUrl: 'https://github.com',
+        linkedinUrl: 'https://linkedin.com',
+        twitterUrl: 'https://twitter.com',
+      },
+    });
+
+    console.log('✅ Neon Cloud PostgreSQL successfully seeded with all Liquid Glass portfolio data!');
+  } catch (error) {
+    console.error('Seeding error:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+main();
