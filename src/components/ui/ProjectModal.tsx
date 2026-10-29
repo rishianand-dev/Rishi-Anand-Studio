@@ -11,9 +11,9 @@ export default function ProjectModal() {
   if (!selectedProject) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md transition-all">
+    <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-4 pt-24 sm:p-6 sm:pt-28 bg-slate-900/40 backdrop-blur-md transition-all">
       <div
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto liquid-glass-card bg-white/95 rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/90 animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-3xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white/95 rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/90 animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -107,4 +107,3 @@ export default function ProjectModal() {
     </div>
   );
 }
-

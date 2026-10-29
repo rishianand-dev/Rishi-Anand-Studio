@@ -1599,8 +1599,8 @@ export default function AdminPage() {
 
       {/* EDIT MODAL: PROJECT */}
       {editingProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-4 pt-24 sm:pt-28 bg-slate-900/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
               <h3 className="font-bold text-slate-900 text-lg">Modify Project</h3>
               <button onClick={() => setEditingProject(null)} className="p-1 rounded-full hover:bg-slate-100 cursor-pointer">
@@ -1748,8 +1748,8 @@ export default function AdminPage() {
 
       {/* EDIT MODAL: EXPERIENCE */}
       {editingExperience && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-4 pt-24 sm:pt-28 bg-slate-900/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
               <h3 className="font-bold text-slate-900 text-lg">Modify Experience</h3>
               <button onClick={() => setEditingExperience(null)} className="p-1 rounded-full hover:bg-slate-100 cursor-pointer">
@@ -1862,8 +1862,8 @@ export default function AdminPage() {
 
       {/* EDIT MODAL: EDUCATION */}
       {editingEducation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto p-4 pt-24 sm:pt-28 bg-slate-900/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
               <h3 className="font-bold text-slate-900 text-lg">Modify Education</h3>
               <button onClick={() => setEditingEducation(null)} className="p-1 rounded-full hover:bg-slate-100 cursor-pointer">
