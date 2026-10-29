@@ -67,6 +67,31 @@ export interface ProfileData {
   githubUrl?: string | null;
   linkedinUrl?: string | null;
   twitterUrl?: string | null;
+  contactEmail: string;
+  footerBrand: string;
+  footerLabel: string;
+  footerCopyright: string;
+  footerTechStack: string;
+  aboutLabel: string;
+  aboutHeading: string;
+  aboutIntroTitle: string;
+  aboutParagraphOne: string;
+  aboutParagraphTwo: string;
+  aboutResumeLabel: string;
+  aboutGithubLabel: string;
+  aboutContactLabel: string;
+  aboutPrincipleOneTitle: string;
+  aboutPrincipleOneDescription: string;
+  aboutPrincipleTwoTitle: string;
+  aboutPrincipleTwoDescription: string;
+  aboutPrincipleThreeTitle: string;
+  aboutPrincipleThreeDescription: string;
+  heroTechStack: string;
+  heroCodeLineOne: string;
+  heroCodeLineTwo: string;
+  heroCodeLineThree: string;
+  heroStatusLabel: string;
+  heroStatusText: string;
 }
 
 export interface SeoSettingsData {

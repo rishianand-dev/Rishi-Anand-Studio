@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { usePortfolioStore } from '@/lib/store';
 import { X, Upload, Plus, CheckCircle, Loader2, Image as ImageIcon } from 'lucide-react';
-import { uploadPortfolioFile, isFirebaseConfigured } from '@/lib/firebase';
+import { uploadPortfolioFile } from '@/lib/upload';
 import confetti from 'canvas-confetti';
 
 export default function AdminDrawer() {
@@ -117,7 +117,7 @@ export default function AdminDrawer() {
             <div>
               <h3 className="text-xl font-bold text-slate-900">Add New Project</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Saved to PostgreSQL & photos stored via Firebase
+                Saved to PostgreSQL & photos stored via Neon Object Storage
               </p>
             </div>
             <button
@@ -225,7 +225,7 @@ export default function AdminDrawer() {
               <label className="block text-xs font-semibold uppercase text-slate-600 mb-1 flex items-center justify-between">
                 <span>Showcase Screenshot</span>
                 <span className="text-[10px] text-indigo-600 font-normal">
-                  {isFirebaseConfigured ? 'Firebase Cloud Storage' : 'Firebase Ready & Preview'}
+                  Neon Object Storage
                 </span>
               </label>
               
@@ -302,7 +302,7 @@ export default function AdminDrawer() {
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Writing to Postgres & Firebase...</span>
+                    <span>Writing to Postgres & Neon Storage...</span>
                   </>
                 ) : (
                   <>
@@ -318,4 +318,3 @@ export default function AdminDrawer() {
     </div>
   );
 }
-

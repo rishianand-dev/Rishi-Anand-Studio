@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Mail, Send, Paperclip, CheckCircle2, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { uploadPortfolioFile, isFirebaseConfigured } from '@/lib/firebase';
+import { uploadPortfolioFile } from '@/lib/upload';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -94,7 +94,7 @@ export default function ContactSection() {
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-2">Message Sent!</h3>
             <p className="text-slate-600 max-w-md text-sm mb-6">
-              Thank you for reaching out. Your message has been saved to the PostgreSQL database and I&apos;ll get back to you shortly.
+              Thank you for reaching out. I&apos;ll get back to you shortly.
             </p>
             <button
               onClick={() => setStatus('idle')}
@@ -162,13 +162,11 @@ export default function ContactSection() {
               />
             </div>
 
-            {/* File Upload powered by Firebase Storage */}
+            {/* File Upload powered by Neon Object Storage */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span>Attachment / Spec (Optional)</span>
-                <span className="text-[10px] text-indigo-600 lowercase font-normal">
-                  {isFirebaseConfigured ? 'Uploaded to Firebase Storage' : 'Local Preview & Firebase ready'}
-                </span>
+                
               </label>
               <div className="flex items-center gap-3">
                 <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/70 hover:bg-white border border-slate-200/70 text-xs font-medium text-slate-700 transition-all">
@@ -232,4 +230,3 @@ export default function ContactSection() {
     </section>
   );
 }
-

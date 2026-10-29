@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { usePortfolioStore } from '@/lib/store';
 
 export default function LiquidSphere() {
+  const { profile } = usePortfolioStore();
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Parallax motion tracking
@@ -116,9 +118,10 @@ export default function LiquidSphere() {
           <span className="w-2 h-2 rounded-full bg-slate-300" />
         </div>
         <pre className="text-xs font-mono text-indigo-950 font-medium leading-relaxed">
-          <span className="text-indigo-600 font-semibold">const</span> craft =<br />
-          {'  '}detail +<br />
-          {'  '}curiosity;
+          <span className="text-indigo-600 font-semibold">{profile.heroCodeLineOne.split(' ')[0]}</span>{' '}
+          {profile.heroCodeLineOne.split(' ').slice(1).join(' ')}<br />
+          {'  '}{profile.heroCodeLineTwo}<br />
+          {'  '}{profile.heroCodeLineThree}
         </pre>
       </motion.div>
 
@@ -134,14 +137,13 @@ export default function LiquidSphere() {
         className="absolute -bottom-4 right-0 sm:right-4 z-20 liquid-badge px-4 py-3 rounded-2xl"
       >
         <div className="text-[10px] tracking-widest font-semibold uppercase text-indigo-400 mb-0.5">
-          CURRENTLY
+        {profile.heroStatusLabel}
         </div>
         <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-          <span>Building for the web</span>
+        <span>{profile.heroStatusText}</span>
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
         </div>
       </motion.div>
     </div>
   );
 }
-

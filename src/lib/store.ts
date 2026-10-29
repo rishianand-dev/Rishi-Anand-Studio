@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { Project, ExperienceItem, ProfileData, EducationItem, SkillItem } from './types';
 import { INITIAL_PROJECTS, INITIAL_EXPERIENCE, INITIAL_PROFILE, INITIAL_EDUCATION, INITIAL_SKILLS } from './initial-data';
 
+const sortByOrder = <T extends { order: number }>(items: T[]) =>
+  [...items].sort((a, b) => a.order - b.order);
+
 interface PortfolioState {
   // Navigation & Sections
   activeSection: string;
@@ -78,14 +81,14 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
   toggleLiquidGlow: () => set((state) => ({ liquidGlow: !state.liquidGlow })),
 
   projects: INITIAL_PROJECTS,
-  setProjects: (projects) => set({ projects }),
+  setProjects: (projects) => set({ projects: sortByOrder(projects) }),
   addProject: (project) =>
     set((state) => ({
-      projects: [project, ...state.projects.filter((p) => p.id !== project.id)],
+      projects: sortByOrder([...state.projects.filter((p) => p.id !== project.id), project]),
     })),
   updateProjectInStore: (project) =>
     set((state) => ({
-      projects: state.projects.map((p) => (p.id === project.id ? project : p)),
+      projects: sortByOrder(state.projects.map((p) => (p.id === project.id ? project : p))),
     })),
   deleteProjectFromStore: (id) =>
     set((state) => ({
@@ -93,14 +96,14 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
     })),
 
   experiences: INITIAL_EXPERIENCE,
-  setExperiences: (experiences) => set({ experiences }),
+  setExperiences: (experiences) => set({ experiences: sortByOrder(experiences) }),
   addExperience: (exp) =>
     set((state) => ({
-      experiences: [...state.experiences, exp],
+      experiences: sortByOrder([...state.experiences.filter((item) => item.id !== exp.id), exp]),
     })),
   updateExperienceInStore: (exp) =>
     set((state) => ({
-      experiences: state.experiences.map((e) => (e.id === exp.id ? exp : e)),
+      experiences: sortByOrder(state.experiences.map((e) => (e.id === exp.id ? exp : e))),
     })),
   deleteExperienceFromStore: (id) =>
     set((state) => ({
@@ -108,14 +111,14 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
     })),
 
   educations: INITIAL_EDUCATION,
-  setEducations: (educations) => set({ educations }),
+  setEducations: (educations) => set({ educations: sortByOrder(educations) }),
   addEducation: (edu) =>
     set((state) => ({
-      educations: [...state.educations, edu],
+      educations: sortByOrder([...state.educations.filter((item) => item.id !== edu.id), edu]),
     })),
   updateEducationInStore: (edu) =>
     set((state) => ({
-      educations: state.educations.map((e) => (e.id === edu.id ? edu : e)),
+      educations: sortByOrder(state.educations.map((e) => (e.id === edu.id ? edu : e))),
     })),
   deleteEducationFromStore: (id) =>
     set((state) => ({
@@ -123,14 +126,14 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
     })),
 
   skills: INITIAL_SKILLS,
-  setSkills: (skills) => set({ skills }),
+  setSkills: (skills) => set({ skills: sortByOrder(skills) }),
   addSkill: (skill) =>
     set((state) => ({
-      skills: [...state.skills, skill],
+      skills: sortByOrder([...state.skills.filter((item) => item.id !== skill.id), skill]),
     })),
   updateSkillInStore: (skill) =>
     set((state) => ({
-      skills: state.skills.map((s) => (s.id === skill.id ? skill : s)),
+      skills: sortByOrder(state.skills.map((s) => (s.id === skill.id ? skill : s))),
     })),
   deleteSkillFromStore: (id) =>
     set((state) => ({

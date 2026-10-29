@@ -3,11 +3,11 @@
 import React from 'react';
 import Image from 'next/image';
 import { usePortfolioStore } from '@/lib/store';
-import { ExternalLink, Github, Star, Sparkles, Layers, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, Github, Star, ArrowUpRight } from 'lucide-react';
 import { Project } from '@/lib/types';
 
 export default function WorkSection() {
-  const { projects, selectedCategory, setSelectedCategory, setSelectedProject, setAdminDrawerOpen } = usePortfolioStore();
+  const { projects, selectedCategory, setSelectedCategory, setSelectedProject } = usePortfolioStore();
 
   const categories = ['All', 'Full Stack', 'Frontend', 'Distributed Systems', 'AI / Creative'];
 
@@ -125,26 +125,6 @@ export default function WorkSection() {
         ))}
       </div>
 
-      {/* Add Project CTA / Info */}
-      <div className="mt-12 p-8 rounded-3xl liquid-glass-card border border-indigo-100/80 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-        <div>
-          <h4 className="text-lg font-bold text-slate-900 mb-1 flex items-center justify-center sm:justify-start gap-2">
-            <Sparkles className="w-5 h-5 text-indigo-600" />
-            <span>Store projects & photos directly</span>
-          </h4>
-          <p className="text-sm text-slate-600">
-            Powered by PostgreSQL database & Firebase Storage for project screenshots and assets.
-          </p>
-        </div>
-        <button
-          onClick={() => setAdminDrawerOpen(true)}
-          className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-md transition-all flex items-center gap-2 whitespace-nowrap"
-        >
-          <Layers className="w-4 h-4" />
-          <span>Upload New Project</span>
-        </button>
-      </div>
     </section>
   );
 }
-

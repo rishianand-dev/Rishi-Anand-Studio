@@ -10,18 +10,18 @@ export default function AboutSection() {
   const principles = [
     {
       icon: <Zap className="w-5 h-5 text-indigo-600" />,
-      title: 'Performance-First',
-      description: 'Zero layout shift, 60fps animations, optimized bundle footprints, and aggressive edge caching.',
+      title: profile.aboutPrincipleOneTitle,
+      description: profile.aboutPrincipleOneDescription,
     },
     {
       icon: <Sparkles className="w-5 h-5 text-purple-600" />,
-      title: 'Micro-Interactions & Polish',
-      description: 'Obsessed with fluid transitions, haptics, spring physics, and thoughtful states that make software feel alive.',
+      title: profile.aboutPrincipleTwoTitle,
+      description: profile.aboutPrincipleTwoDescription,
     },
     {
       icon: <Cpu className="w-5 h-5 text-indigo-600" />,
-      title: 'Scalable Architecture',
-      description: 'Robust PostgreSQL schemas, type-safe full-stack contracts, clean Zustand stores, and resilient cloud storage.',
+      title: profile.aboutPrincipleThreeTitle,
+      description: profile.aboutPrincipleThreeDescription,
     },
   ];
 
@@ -37,10 +37,10 @@ export default function AboutSection() {
       <div className="mb-12">
         <div className="text-xs font-mono font-semibold tracking-widest uppercase text-indigo-600 mb-3 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-indigo-500" />
-          <span>ABOUT & PHILOSOPHY</span>
+          <span>{profile.aboutLabel}</span>
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-          Where engineering precision meets design craft.
+          {profile.aboutHeading}
         </h2>
       </div>
 
@@ -49,14 +49,14 @@ export default function AboutSection() {
         <div className="lg:col-span-7 liquid-glass-card rounded-3xl p-8 sm:p-10 flex flex-col justify-between">
           <div>
             <h3 className="text-2xl font-bold text-slate-900 mb-6">
-              Hi, I&apos;m {profile.name} — crafting software that scales effortlessly.
+              {profile.aboutIntroTitle.replace('{name}', profile.name)}
             </h3>
             <div className="space-y-4 text-slate-600 leading-relaxed text-base">
               <p>
-                Over the past 6+ years, I&apos;ve dedicated myself to building high-scale full-stack applications and silky user interfaces. I bridge the gap between creative visual design and bulletproof distributed systems.
+                {profile.aboutParagraphOne}
               </p>
               <p>
-                Whether I&apos;m fine-tuning WebGL shaders, architecting multi-tenant PostgreSQL databases, or structuring predictable global client state with Zustand, my goal remains constant: software that feels weightless and effortless.
+                {profile.aboutParagraphTwo}
               </p>
             </div>
           </div>
@@ -71,26 +71,28 @@ export default function AboutSection() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-colors"
             >
               <FileText className="w-4 h-4" />
-              <span>Access Resume (PDF)</span>
+              <span>{profile.aboutResumeLabel}</span>
               <ExternalLink className="w-3.5 h-3.5 opacity-80" />
             </a>
 
-            <a
-              href={profile.githubUrl || 'https://github.com'}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-badge hover:bg-white text-slate-800 text-xs font-semibold transition-colors"
-            >
-              <Globe2 className="w-4 h-4 text-indigo-600" />
-              <span>GitHub Profile</span>
-            </a>
+            {profile.githubUrl && (
+              <a
+                href={profile.githubUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full liquid-badge hover:bg-white text-slate-800 text-xs font-semibold transition-colors"
+              >
+                <Globe2 className="w-4 h-4 text-indigo-600" />
+                <span>{profile.aboutGithubLabel}</span>
+              </a>
+            )}
 
             <a
               href="#contact"
               className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-slate-600 hover:text-indigo-600"
             >
               <Terminal className="w-3.5 h-3.5" />
-              <span>Contact me</span>
+              <span>{profile.aboutContactLabel}</span>
             </a>
           </div>
         </div>
@@ -123,7 +125,6 @@ export default function AboutSection() {
             <Code2 className="w-5 h-5 text-indigo-600" />
             <span>Core Tech Stack & Engineering Toolkit</span>
           </h3>
-          <span className="text-xs font-mono text-slate-400">Configurable in Admin</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

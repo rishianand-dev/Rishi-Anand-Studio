@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePortfolioStore } from '@/lib/store';
-import { FileText, Lock, PlusCircle } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 export default function Navbar() {
-  const { activeSection, setActiveSection, profile, setAdminDrawerOpen } = usePortfolioStore();
+  const { activeSection, setActiveSection, profile } = usePortfolioStore();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,18 +29,18 @@ export default function Navbar() {
       <nav
         className={`pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all duration-300 ${
           scrolled ? 'liquid-glass-nav shadow-lg scale-[0.98]' : 'liquid-glass-nav'
-        } max-w-5xl w-full`}
+        } max-w-5xl w-full min-w-0`}
       >
         {/* Brand / Logo */}
         <Link
           href="/"
           className="text-base sm:text-lg font-bold tracking-tight text-slate-900 hover:text-indigo-600 transition-colors shrink-0"
         >
-          AM<span className="text-indigo-600">.</span>
+          {profile.footerBrand}
         </Link>
 
         {/* Navigation Links */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navItems.map((item) => {
             const isActive = activeSection === item.name.toLowerCase();
             return (
@@ -48,7 +48,7 @@ export default function Navbar() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setActiveSection(item.name.toLowerCase())}
-                className={`relative px-2.5 sm:px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full transition-all duration-200 ${
+                className={`relative shrink-0 px-2 sm:px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full transition-all duration-200 ${
                   isActive
                     ? 'text-indigo-900 bg-white/70 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
@@ -61,13 +61,13 @@ export default function Navbar() {
         </div>
 
         {/* Right side: Resume CTA, Status & Admin Login */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {/* Direct Resume Button */}
           <a
             href={profile.resumeUrl || '/resume.pdf'}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 hover:bg-white text-indigo-900 border border-indigo-200/70 text-xs font-semibold shadow-2xs transition-all"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-white/80 hover:bg-white text-indigo-900 border border-indigo-200/70 text-xs font-semibold shadow-2xs transition-all"
             title="Access Official Resume"
           >
             <FileText className="w-3.5 h-3.5 text-indigo-600" />
@@ -85,15 +85,6 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Admin Login Link */}
-          <Link
-            href="/admin"
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-full bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-medium transition-colors flex items-center gap-1"
-            title="Admin Dashboard (Login Required)"
-          >
-            <Lock className="w-3.5 h-3.5 text-slate-500" />
-            <span className="hidden md:inline">Admin</span>
-          </Link>
         </div>
       </nav>
     </header>

@@ -22,6 +22,8 @@ import {
   AlertCircle,
   Loader2,
   ArrowLeft,
+  ArrowUp,
+  ArrowDown,
   X,
   Search,
   Globe,
@@ -30,7 +32,7 @@ import {
 import { usePortfolioStore } from '@/lib/store';
 import { Project, ExperienceItem, EducationItem, SkillItem, ProfileData, SeoSettingsData } from '@/lib/types';
 import { INITIAL_SEO } from '@/lib/initial-data';
-import { uploadPortfolioFile, isFirebaseConfigured } from '@/lib/firebase';
+import { uploadPortfolioFile } from '@/lib/upload';
 import confetti from 'canvas-confetti';
 
 export default function AdminPage() {
@@ -67,7 +69,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'heading' | 'projects' | 'tech' | 'experience' | 'education' | 'seo'>('heading');
+  const [activeTab, setActiveTab] = useState<'heading' | 'about' | 'footer' | 'projects' | 'tech' | 'experience' | 'education' | 'seo'>('heading');
 
   // Notification Toast
   const [toast, setToast] = useState<string | null>(null);
@@ -108,8 +110,9 @@ export default function AdminPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [profileRes, seoRes] = await Promise.all([
+        const [profileRes, projectsRes, seoRes] = await Promise.all([
           fetch('/api/profile'),
+          fetch('/api/projects'),
           fetch('/api/seo'),
         ]);
 
@@ -124,6 +127,11 @@ export default function AdminPage() {
           if (data.skills) setSkills(data.skills);
         }
 
+        const projectsData = await projectsRes.json();
+        if (projectsData.success && projectsData.projects) {
+          setProjects(projectsData.projects);
+        }
+
         const seoData = await seoRes.json();
         if (seoData.success && seoData.seo) {
           setSeoForm(seoData.seo);
@@ -135,11 +143,87 @@ export default function AdminPage() {
     if (isAuthenticated) {
       fetchData();
     }
-  }, [isAuthenticated, setProfile, setExperiences, setEducations, setSkills]);
+  }, [isAuthenticated, setProfile, setProjects, setExperiences, setEducations, setSkills]);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  };
+
+  const moveItem = async <T extends { id: string; order: number }>(
+    items: T[],
+    index: number,
+    direction: -1 | 1,
+    endpoint: string,
+    setItems: (items: T[]) => void,
+    label: string
+  ) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    const reordered = [...items];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+    const normalized = reordered.map((item, itemIndex) => ({
+      ...item,
+      order: itemIndex + 1,
+    }));
+
+    try {
+      const responses = await Promise.all(
+        normalized.map((item) =>
+          fetch(`${endpoint}/${item.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order: item.order }),
+          })
+        )
+      );
+
+      if (responses.some((response) => !response.ok)) {
+        throw new Error(`Failed to update ${label.toLowerCase()} order`);
+      }
+
+      setItems(normalized);
+      showToast(`${label} order updated`);
+    } catch (error) {
+      console.error(`Error reordering ${label.toLowerCase()}:`, error);
+      showToast(`Could not update ${label.toLowerCase()} order`);
+    }
+  };
+
+  const moveSkill = async (categorySkills: SkillItem[], index: number, direction: -1 | 1) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= categorySkills.length) return;
+
+    const current = categorySkills[index];
+    const target = categorySkills[targetIndex];
+    try {
+      const responses = await Promise.all([
+        fetch(`/api/skills/${current.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: target.order }),
+        }),
+        fetch(`/api/skills/${target.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: current.order }),
+        }),
+      ]);
+
+      if (responses.some((response) => !response.ok)) {
+        throw new Error('Failed to update skill order');
+      }
+
+      const reordered = [...categorySkills];
+      [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+      const reorderedById = new Map(reordered.map((skill) => [skill.id, skill]));
+      setSkills(skills.map((skill) => reorderedById.get(skill.id) || skill));
+      showToast('Tech stack order updated');
+    } catch (error) {
+      console.error('Error reordering skills:', error);
+      showToast('Could not update tech stack order');
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -382,6 +466,26 @@ export default function AdminPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab('about')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            activeTab === 'about' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>About Section</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('footer')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            activeTab === 'footer' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          <FileText className="w-4 h-4" />
+          <span>Footer Controls</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('projects')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
             activeTab === 'projects' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
@@ -494,6 +598,62 @@ export default function AdminPage() {
               />
             </div>
 
+            <div className="pt-4 border-t border-slate-200/60 space-y-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Hero visual controls</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Control the technology strip, floating code card, and status badge shown beside the hero.
+                </p>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
+                  Technology Strip
+                </label>
+                <input
+                  type="text"
+                  value={profileForm.heroTechStack}
+                  onChange={(e) => setProfileForm({ ...profileForm, heroTechStack: e.target.value })}
+                  placeholder="NEXT.JS 14,POSTGRESQL,NEON STORAGE,ZUSTAND"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+                <p className="text-[11px] text-slate-500 mt-1.5">Separate each item with a comma.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <input
+                  value={profileForm.heroCodeLineOne}
+                  onChange={(e) => setProfileForm({ ...profileForm, heroCodeLineOne: e.target.value })}
+                  placeholder="const craft ="
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+                <input
+                  value={profileForm.heroCodeLineTwo}
+                  onChange={(e) => setProfileForm({ ...profileForm, heroCodeLineTwo: e.target.value })}
+                  placeholder="detail +"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+                <input
+                  value={profileForm.heroCodeLineThree}
+                  onChange={(e) => setProfileForm({ ...profileForm, heroCodeLineThree: e.target.value })}
+                  placeholder="curiosity;"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input
+                  value={profileForm.heroStatusLabel}
+                  onChange={(e) => setProfileForm({ ...profileForm, heroStatusLabel: e.target.value })}
+                  placeholder="CURRENTLY"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+                <input
+                  value={profileForm.heroStatusText}
+                  onChange={(e) => setProfileForm({ ...profileForm, heroStatusText: e.target.value })}
+                  placeholder="Building for the web"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
@@ -524,10 +684,8 @@ export default function AdminPage() {
             {/* Resume Upload Module */}
             <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
               <label className="block text-xs font-semibold uppercase text-indigo-950 mb-1 flex items-center justify-between">
-                <span>Resume Document / URL (Firebase Storage)</span>
-                <span className="text-[10px] text-indigo-600 font-normal">
-                  {isFirebaseConfigured ? 'Firebase Cloud Bucket' : 'Firebase Ready'}
-                </span>
+                <span>Resume Document / URL (Neon Object Storage)</span>
+                <span className="text-[10px] text-indigo-600 font-normal">Neon Bucket: media</span>
               </label>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-2">
@@ -598,6 +756,23 @@ export default function AdminPage() {
               </div>
             </div>
 
+            <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
+              <label className="block text-xs font-semibold uppercase text-indigo-950 mb-1.5">
+                Contact Form Recipient Email
+              </label>
+              <input
+                type="email"
+                required
+                value={profileForm.contactEmail}
+                onChange={(e) => setProfileForm({ ...profileForm, contactEmail: e.target.value })}
+                placeholder="you@example.com"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+              />
+              <p className="text-[11px] text-slate-500 mt-1.5">
+                Contact form submissions will be delivered to this address through Resend.
+              </p>
+            </div>
+
             <button
               type="submit"
               className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center gap-2 cursor-pointer"
@@ -609,7 +784,147 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* TAB CONTENT 2: PROJECTS */}
+      {/* TAB CONTENT 2: ABOUT */}
+      {activeTab === 'about' && (
+        <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
+          <div className="pb-4 border-b border-slate-200/60 mb-6">
+            <h2 className="text-lg font-bold text-slate-900">About Section Controls</h2>
+            <p className="text-xs text-slate-500">
+              Control every text element in the left bio card and each right-side philosophy card.
+              Use <code className="text-indigo-600">{'{name}'}</code> in the intro title to insert the profile name.
+            </p>
+          </div>
+
+          <form onSubmit={handleProfileSave} className="space-y-8 max-w-4xl">
+            <section className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900">Section heading</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Eyebrow Label</label>
+                  <input value={profileForm.aboutLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutLabel: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Main Heading</label>
+                  <input value={profileForm.aboutHeading} onChange={(e) => setProfileForm({ ...profileForm, aboutHeading: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900">Left bio card</h3>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Intro Title</label>
+                <input value={profileForm.aboutIntroTitle} onChange={(e) => setProfileForm({ ...profileForm, aboutIntroTitle: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <textarea rows={5} value={profileForm.aboutParagraphOne} onChange={(e) => setProfileForm({ ...profileForm, aboutParagraphOne: e.target.value })} placeholder="First paragraph" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none" />
+                <textarea rows={5} value={profileForm.aboutParagraphTwo} onChange={(e) => setProfileForm({ ...profileForm, aboutParagraphTwo: e.target.value })} placeholder="Second paragraph" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <input value={profileForm.aboutResumeLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutResumeLabel: e.target.value })} placeholder="Resume button label" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                <input value={profileForm.aboutGithubLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutGithubLabel: e.target.value })} placeholder="GitHub button label" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                <input value={profileForm.aboutContactLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutContactLabel: e.target.value })} placeholder="Contact button label" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <h3 className="text-sm font-bold text-slate-900">Right philosophy cards</h3>
+              {([
+                ['One', 'aboutPrincipleOneTitle', 'aboutPrincipleOneDescription'],
+                ['Two', 'aboutPrincipleTwoTitle', 'aboutPrincipleTwoDescription'],
+                ['Three', 'aboutPrincipleThreeTitle', 'aboutPrincipleThreeDescription'],
+              ] as const).map(([label, titleKey, descriptionKey]) => (
+                <div key={label} className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <input value={profileForm[titleKey]} onChange={(e) => setProfileForm({ ...profileForm, [titleKey]: e.target.value })} placeholder={`Card ${label} title`} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                  <textarea rows={2} value={profileForm[descriptionKey]} onChange={(e) => setProfileForm({ ...profileForm, [descriptionKey]: e.target.value })} placeholder={`Card ${label} description`} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none" />
+                </div>
+              ))}
+            </section>
+
+            <button type="submit" className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center gap-2 cursor-pointer">
+              <Save className="w-4 h-4" />
+              <span>Save About Settings</span>
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* TAB CONTENT 3: FOOTER */}
+      {activeTab === 'footer' && (
+        <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
+          <div className="pb-4 border-b border-slate-200/60 mb-6">
+            <h2 className="text-lg font-bold text-slate-900">Footer Controls</h2>
+            <p className="text-xs text-slate-500">
+              Customize the footer branding, copyright text, and technology line shown on the home page.
+            </p>
+          </div>
+
+          <form onSubmit={handleProfileSave} className="space-y-6 max-w-3xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
+                  Footer Brand
+                </label>
+                <input
+                  type="text"
+                  value={profileForm.footerBrand}
+                  onChange={(e) => setProfileForm({ ...profileForm, footerBrand: e.target.value })}
+                  placeholder="RA."
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
+                  Footer Label
+                </label>
+                <input
+                  type="text"
+                  value={profileForm.footerLabel}
+                  onChange={(e) => setProfileForm({ ...profileForm, footerLabel: e.target.value })}
+                  placeholder="Software Engineer Portfolio"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
+                Copyright Text
+              </label>
+              <input
+                type="text"
+                value={profileForm.footerCopyright}
+                onChange={(e) => setProfileForm({ ...profileForm, footerCopyright: e.target.value })}
+                placeholder="All rights reserved."
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
+                Technology Line
+              </label>
+              <input
+                type="text"
+                value={profileForm.footerTechStack}
+                onChange={(e) => setProfileForm({ ...profileForm, footerTechStack: e.target.value })}
+                placeholder="Designed with Next.js, PostgreSQL, Neon Storage, Zustand & TypeScript"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              <span>Save Footer Settings</span>
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* TAB CONTENT 3: PROJECTS */}
       {activeTab === 'projects' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -645,7 +960,7 @@ export default function AdminPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {projects.map((p) => (
+            {projects.map((p, index) => (
               <div key={p.id} className="liquid-glass-card rounded-2xl p-5 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -679,12 +994,33 @@ export default function AdminPage() {
                   <p className="text-xs text-slate-600 line-clamp-2 mb-3">{p.description}</p>
                 </div>
 
-                <div className="flex flex-wrap gap-1 pt-2 border-t border-slate-200/50">
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/50">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => moveItem(projects, index, -1, '/api/projects', setProjects, 'Project')}
+                      disabled={index === 0}
+                      className="p-1 rounded hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      title="Move project up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => moveItem(projects, index, 1, '/api/projects', setProjects, 'Project')}
+                      disabled={index === projects.length - 1}
+                      className="p-1 rounded hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                      title="Move project down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[10px] text-slate-400">Order {index + 1}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1 justify-end">
                   {p.tags.slice(0, 4).map((t) => (
                     <span key={t} className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-slate-600 border border-slate-200/50">
                       {t}
                     </span>
                   ))}
+                  </div>
                 </div>
               </div>
             ))}
@@ -734,22 +1070,41 @@ export default function AdminPage() {
                 <div className="flex flex-col gap-2">
                   {skills
                     .filter((s) => s.category.toLowerCase() === cat.toLowerCase())
-                    .map((s) => (
+                    .map((s, index, categorySkills) => (
                       <div
                         key={s.id}
                         className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/70 border border-slate-200/60 shadow-2xs text-xs"
                       >
                         <span className="font-medium text-slate-800">{s.name}</span>
-                        <button
-                          onClick={async () => {
-                            await fetch(`/api/skills/${s.id}`, { method: 'DELETE' });
-                            deleteSkillFromStore(s.id);
-                            showToast('Skill removed');
-                          }}
-                          className="text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => moveSkill(categorySkills, index, -1)}
+                            disabled={index === 0}
+                            className="p-1 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                            title="Move skill up"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => moveSkill(categorySkills, index, 1)}
+                            disabled={index === categorySkills.length - 1}
+                            className="p-1 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                            title="Move skill down"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={async () => {
+                              await fetch(`/api/skills/${s.id}`, { method: 'DELETE' });
+                              deleteSkillFromStore(s.id);
+                              showToast('Skill removed');
+                            }}
+                            className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                            title="Delete skill"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     ))}
                 </div>
@@ -789,7 +1144,7 @@ export default function AdminPage() {
           </div>
 
           <div className="space-y-4">
-            {experiences.map((exp) => (
+            {experiences.map((exp, index) => (
               <div key={exp.id} className="liquid-glass-card rounded-2xl p-6 flex flex-col sm:flex-row justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -812,6 +1167,22 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex sm:flex-col items-center gap-2 self-start">
+                  <button
+                    onClick={() => moveItem(experiences, index, -1, '/api/experience', setExperiences, 'Experience')}
+                    disabled={index === 0}
+                    className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Move experience up"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveItem(experiences, index, 1, '/api/experience', setExperiences, 'Experience')}
+                    disabled={index === experiences.length - 1}
+                    className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Move experience down"
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={() => setEditingExperience(exp)}
                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
@@ -866,7 +1237,7 @@ export default function AdminPage() {
           </div>
 
           <div className="space-y-4">
-            {educations.map((edu) => (
+            {educations.map((edu, index) => (
               <div key={edu.id} className="liquid-glass-card rounded-2xl p-6 flex flex-col sm:flex-row justify-between gap-4">
                 <div>
                   <h3 className="font-bold text-slate-900 text-base mb-1">{edu.degree}</h3>
@@ -880,6 +1251,22 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex sm:flex-col items-center gap-2 self-start">
+                  <button
+                    onClick={() => moveItem(educations, index, -1, '/api/education', setEducations, 'Education')}
+                    disabled={index === 0}
+                    className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Move education up"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => moveItem(educations, index, 1, '/api/education', setEducations, 'Education')}
+                    disabled={index === educations.length - 1}
+                    className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Move education down"
+                  >
+                    <ArrowDown className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={() => setEditingEducation(edu)}
                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
@@ -1027,12 +1414,12 @@ export default function AdminPage() {
                   </select>
                 </div>
 
-                {/* OpenGraph Image Upload via Firebase */}
+                {/* OpenGraph Image Upload via Neon Object Storage */}
                 <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
                   <label className="block text-xs font-semibold uppercase text-indigo-950 mb-1 flex items-center justify-between">
                     <span>OpenGraph / Social Share Image (1200x630)</span>
                     <span className="text-[10px] text-indigo-600 font-normal">
-                      {isFirebaseConfigured ? 'Firebase Cloud Storage' : 'Firebase Ready'}
+                      Neon Object Storage
                     </span>
                   </label>
 
@@ -1234,26 +1621,33 @@ export default function AdminPage() {
                 </button>
                 <button
                   onClick={async () => {
-                    const isNew = !projects.some((p) => p.id === editingProject.id);
-                    if (isNew) {
-                      const res = await fetch('/api/projects', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(editingProject),
-                      });
-                      const d = await res.json();
-                      if (d.success) addProject(d.project);
-                    } else {
-                      const res = await fetch(`/api/projects/${editingProject.id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(editingProject),
-                      });
-                      const d = await res.json();
-                      if (d.success) updateProjectInStore(d.project);
+                    try {
+                      const isNew = !projects.some((p) => p.id === editingProject.id);
+                      if (isNew) {
+                        const res = await fetch('/api/projects', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(editingProject),
+                        });
+                        const d = await res.json();
+                        if (!d.success) throw new Error(d.error || 'Failed to create project');
+                        addProject(d.project);
+                      } else {
+                        const res = await fetch(`/api/projects/${editingProject.id}`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(editingProject),
+                        });
+                        const d = await res.json();
+                        if (!d.success) throw new Error(d.error || 'Failed to update project');
+                        updateProjectInStore(d.project);
+                      }
+                      showToast('Project saved to PostgreSQL');
+                      setEditingProject(null);
+                    } catch (error) {
+                      console.error('Error saving project:', error);
+                      showToast(error instanceof Error ? error.message : 'Failed to save project');
                     }
-                    showToast('Project saved to PostgreSQL');
-                    setEditingProject(null);
                   }}
                   className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md cursor-pointer"
                 >

@@ -2,7 +2,7 @@
 
 An ultra-modern, interactive **Liquid Glass** software engineering portfolio inspired by Apple & Figma's refractive glassmorphism design language.
 
-Designed and implemented with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, **PostgreSQL (Prisma ORM)**, **Firebase Storage**, and **Zustand**.
+Designed and implemented with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, **PostgreSQL (Prisma ORM)**, **Neon Object Storage**, and **Zustand**.
 
 ---
 
@@ -18,7 +18,7 @@ Designed and implemented with **Next.js 14 (App Router)**, **TypeScript**, **Tai
   - Secure credential login with HTTP-only cookies (`/api/admin/login`).
   - Default credentials: `admin` / `admin123` (customizable via `.env`).
   - **Heading & Profile Module:** Edit hero headlines, subtitle tags, display name, location, and social links.
-  - **Resume Access & Upload Module:** Direct PDF resume upload via Firebase Storage with live progress.
+  - **Resume Access & Upload Module:** Direct PDF resume upload via Neon Object Storage with live progress.
   - **Projects Module:** Create, edit existing, delete, and reorder projects.
   - **Education Module:** Add, edit, or delete degrees and academic achievements.
   - **Tech Stack Module:** Categorized skills (Frontend, Backend, Practices, Tools) with instant add/remove.
@@ -31,8 +31,8 @@ Designed and implemented with **Next.js 14 (App Router)**, **TypeScript**, **Tai
   - Prisma schema with models for `Project`, `Experience`, `Education`, `Skill`, `ContactMessage`, and `Profile`.
   - Migration and seed scripts (`scripts/seed.mjs`).
   - Resilient database adapter (`src/lib/db.ts`) with zero-downtime fallback for seamless local previews.
-- **Firebase File & Photo Storage:**
-  - Storage SDK integration (`src/lib/firebase.ts`) for storing project screenshots and resume PDFs.
+- **Neon File & Photo Storage:**
+  - S3-compatible server-side storage integration for project screenshots, resume PDFs, SEO images, and contact attachments.
 - **Zustand State Management:**
   - Single-source store (`src/lib/store.ts`) for projects, skills, education, experiences, profile, category filtering, and modal states.
 
@@ -54,13 +54,12 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/liquid_portfolio?sch
 ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="admin123"
 
-# Firebase Cloud Storage (optional for local preview, required for live Firebase storage)
-NEXT_PUBLIC_FIREBASE_API_KEY=""
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=""
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=""
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=""
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=""
-NEXT_PUBLIC_FIREBASE_APP_ID=""
+# Neon Object Storage
+NEON_STORAGE_BUCKET="media"
+AWS_ENDPOINT_URL_S3=""
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_REGION=""
 ```
 
 ### 3. Database Migration & Seeding (PostgreSQL)
@@ -85,7 +84,13 @@ npm run dev
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS + Custom Liquid Glass Filters
 - **Database:** PostgreSQL + Prisma ORM
-- **File Storage:** Firebase Storage
+- **File Storage:** Neon Object Storage
 - **State Management:** Zustand
 - **Animations:** Framer Motion + Canvas Confetti
 - **Icons:** Lucide React
+
+---
+
+## 📚 Full Documentation
+
+For the complete architecture, setup instructions, data model, API reference, admin workflow, fallback behavior, and deployment checklist, see [DOCUMENTATION.md](./DOCUMENTATION.md).

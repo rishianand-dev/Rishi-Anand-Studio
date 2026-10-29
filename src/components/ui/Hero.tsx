@@ -82,10 +82,9 @@ export default function Hero() {
         </a>
 
         <div className="hidden sm:flex items-center gap-6 text-[11px] text-slate-500 font-mono">
-          <span>NEXT.JS 14</span>
-          <span>POSTGRESQL</span>
-          <span>FIREBASE STORAGE</span>
-          <span>ZUSTAND</span>
+          {profile.heroTechStack.split(',').map((technology) => (
+            <span key={technology}>{technology.trim()}</span>
+          ))}
         </div>
       </div>
     </section>
