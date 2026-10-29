@@ -90,6 +90,10 @@ export default function AdminPage() {
   const [ogUploading, setOgUploading] = useState(false);
   const [ogProgress, setOgProgress] = useState<number | null>(null);
   const [seoSaving, setSeoSaving] = useState(false);
+  const techCategories = profileForm.techStackCategoryOrder
+    .split(',')
+    .map((category) => category.trim())
+    .filter(Boolean);
 
   // Check login status on mount
   useEffect(() => {
@@ -236,6 +240,31 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error reordering skills:', error);
       showToast('Could not update tech stack order');
+    }
+  };
+
+  const moveTechCategory = (index: number, direction: -1 | 1) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= techCategories.length) return;
+    const reordered = [...techCategories];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+    setProfileForm({ ...profileForm, techStackCategoryOrder: reordered.join(',') });
+  };
+
+  const saveTechCategoryOrder = async () => {
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileForm),
+      });
+      const data = await parseApiResponse<{ success: true; profile: ProfileData }>(res);
+      setProfile(data.profile);
+      setProfileForm(data.profile);
+      showToast('Tech stack category order updated');
+    } catch (error) {
+      console.error('Error saving tech stack category order:', error);
+      showToast(error instanceof Error ? error.message : 'Could not save category order');
     }
   };
 
@@ -1070,8 +1099,33 @@ export default function AdminPage() {
             </button>
           </div>
 
+          <div className="mb-5 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <h3 className="text-xs font-mono font-bold uppercase text-indigo-700 tracking-wider">Category order</h3>
+                <p className="text-[11px] text-slate-500 mt-1">This order is used on the homepage.</p>
+              </div>
+              <button type="button" onClick={saveTechCategoryOrder} className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-[11px] font-semibold hover:bg-indigo-500 cursor-pointer">
+                Save category order
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {techCategories.map((cat, index) => (
+                <div key={cat} className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-xs font-semibold text-slate-700">
+                  <span>{index + 1}. {cat}</span>
+                  <button onClick={() => moveTechCategory(index, -1)} disabled={index === 0} className="p-0.5 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed" title="Move category up">
+                    <ArrowUp className="w-3 h-3" />
+                  </button>
+                  <button onClick={() => moveTechCategory(index, 1)} disabled={index === techCategories.length - 1} className="p-0.5 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed" title="Move category down">
+                    <ArrowDown className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {['Frontend', 'Backend', 'Practices'].map((cat) => (
+            {techCategories.map((cat) => (
               <div key={cat} className="space-y-3">
                 <h3 className="text-xs font-mono font-bold uppercase text-indigo-700 tracking-wider">
                   {cat}
@@ -1573,8 +1627,9 @@ export default function AdminPage() {
                     onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value as any })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                   >
-                    <option value="Full Stack">Full Stack</option>
+                      <option value="Full Stack">Full Stack</option>
                     <option value="Frontend">Frontend</option>
+                      <option value="Backend">Backend</option>
                     <option value="Distributed Systems">Distributed Systems</option>
                     <option value="AI / Creative">AI / Creative</option>
                   </select>
@@ -1609,6 +1664,29 @@ export default function AdminPage() {
                   onChange={(e) => setEditingProject({ ...editingProject, imageUrl: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Live Project URL</label>
+                  <input
+                    type="url"
+                    value={editingProject.demoUrl || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, demoUrl: e.target.value })}
+                    placeholder="https://your-project.com"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">GitHub URL</label>
+                  <input
+                    type="url"
+                    value={editingProject.githubUrl || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, githubUrl: e.target.value })}
+                    placeholder="https://github.com/username/repository"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
+                  />
+                </div>
               </div>
 
               <div>

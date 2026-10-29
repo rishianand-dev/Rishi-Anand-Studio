@@ -38,6 +38,7 @@ export const INITIAL_PROFILE: ProfileData = {
   heroCodeLineThree: 'curiosity;',
   heroStatusLabel: 'CURRENTLY',
   heroStatusText: 'Building for the web',
+  techStackCategoryOrder: 'Frontend,Backend,Practices',
 };
 
 export const INITIAL_SEO: SeoSettingsData = {

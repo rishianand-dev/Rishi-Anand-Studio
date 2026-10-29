@@ -106,6 +106,7 @@ model Profile {
   heroCodeLineThree String @default("curiosity;")
   heroStatusLabel String   @default("CURRENTLY")
   heroStatusText  String   @default("Building for the web")
+  techStackCategoryOrder String @default("Frontend,Backend,Practices")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }

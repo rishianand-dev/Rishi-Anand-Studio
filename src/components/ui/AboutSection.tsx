@@ -26,7 +26,10 @@ export default function AboutSection() {
   ];
 
   // Group dynamic skills by category
-  const categories = ['Frontend', 'Backend', 'Practices'];
+  const categories = profile.techStackCategoryOrder
+    .split(',')
+    .map((category) => category.trim())
+    .filter(Boolean);
   const groupedSkills = categories.reduce((acc, cat) => {
     acc[cat] = skills.filter((s) => s.category.toLowerCase() === cat.toLowerCase());
     return acc;

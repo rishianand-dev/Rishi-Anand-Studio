@@ -161,6 +161,7 @@ export default function AdminDrawer() {
                 >
                   <option value="Full Stack">Full Stack</option>
                   <option value="Frontend">Frontend</option>
+                  <option value="Backend">Backend</option>
                   <option value="Distributed Systems">Distributed Systems</option>
                   <option value="AI / Creative">AI / Creative</option>
                 </select>

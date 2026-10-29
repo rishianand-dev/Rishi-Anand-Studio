@@ -9,7 +9,7 @@ import { Project } from '@/lib/types';
 export default function WorkSection() {
   const { projects, selectedCategory, setSelectedCategory, setSelectedProject } = usePortfolioStore();
 
-  const categories = ['All', 'Full Stack', 'Frontend', 'Distributed Systems', 'AI / Creative'];
+  const categories = ['All', 'Full Stack', 'Frontend', 'Backend', 'Distributed Systems', 'AI / Creative'];
 
   const filteredProjects = selectedCategory === 'All'
     ? projects
@@ -30,12 +30,12 @@ export default function WorkSection() {
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-full liquid-glass-nav w-fit">
+        <div className="flex flex-wrap items-center justify-center gap-2 p-2 rounded-3xl liquid-glass-nav w-fit">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 ${
                 selectedCategory === category
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'

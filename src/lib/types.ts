@@ -4,7 +4,7 @@ export interface Project {
   slug: string;
   description: string;
   longDescription?: string | null;
-  category: 'Full Stack' | 'Frontend' | 'Distributed Systems' | 'AI / Creative';
+  category: 'Full Stack' | 'Frontend' | 'Backend' | 'Distributed Systems' | 'AI / Creative';
   tags: string[];
   featured: boolean;
   imageUrl: string;
@@ -92,6 +92,7 @@ export interface ProfileData {
   heroCodeLineThree: string;
   heroStatusLabel: string;
   heroStatusText: string;
+  techStackCategoryOrder: string;
 }
 
 export interface SeoSettingsData {

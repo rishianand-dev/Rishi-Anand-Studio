@@ -124,6 +124,7 @@ export async function getProfile(): Promise<ProfileData> {
         heroCodeLineThree: profile.heroCodeLineThree,
         heroStatusLabel: profile.heroStatusLabel,
         heroStatusText: profile.heroStatusText,
+        techStackCategoryOrder: profile.techStackCategoryOrder,
       };
     }
     return memoryProfile;
@@ -174,6 +175,7 @@ export async function updateProfile(data: Partial<ProfileData>): Promise<Profile
         heroCodeLineThree: data.heroCodeLineThree ?? current.heroCodeLineThree,
         heroStatusLabel: data.heroStatusLabel ?? current.heroStatusLabel,
         heroStatusText: data.heroStatusText ?? current.heroStatusText,
+        techStackCategoryOrder: data.techStackCategoryOrder ?? current.techStackCategoryOrder,
       },
       create: {
         id: 'default-profile',
@@ -212,6 +214,7 @@ export async function updateProfile(data: Partial<ProfileData>): Promise<Profile
         heroCodeLineThree: data.heroCodeLineThree ?? INITIAL_PROFILE.heroCodeLineThree,
         heroStatusLabel: data.heroStatusLabel ?? INITIAL_PROFILE.heroStatusLabel,
         heroStatusText: data.heroStatusText ?? INITIAL_PROFILE.heroStatusText,
+        techStackCategoryOrder: data.techStackCategoryOrder ?? INITIAL_PROFILE.techStackCategoryOrder,
       },
     });
     memoryProfile = { ...memoryProfile, ...updated };
