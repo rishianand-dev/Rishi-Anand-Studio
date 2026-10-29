@@ -58,7 +58,6 @@ export default function AdminPage() {
     skills,
     setSkills,
     addSkill,
-    updateSkillInStore,
     deleteSkillFromStore,
   } = usePortfolioStore();
 
@@ -374,10 +373,10 @@ export default function AdminPage() {
               />
             </div>
 
-            <div className="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100/50 text-[11px] text-slate-600">
+            {/* <div className="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100/50 text-[11px] text-slate-600">
               💡 Default demo credentials: <span className="font-mono font-semibold text-indigo-700">admin</span> /{' '}
               <span className="font-mono font-semibold text-indigo-700">admin123</span>
-            </div>
+            </div> */}
 
             <button
               type="submit"
