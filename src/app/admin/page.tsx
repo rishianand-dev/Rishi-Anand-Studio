@@ -149,6 +149,20 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  const parseApiResponse = async <T extends { success?: boolean; error?: string }>(res: Response): Promise<T> => {
+    const text = await res.text();
+    let data: T;
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      throw new Error(`Server returned ${res.status} with an invalid response`);
+    }
+    if (!res.ok || data.success === false) {
+      throw new Error(data.error || `Request failed with status ${res.status}`);
+    }
+    return data;
+  };
+
   const moveItem = async <T extends { id: string; order: number }>(
     items: T[],
     index: number,
@@ -271,12 +285,10 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData),
       });
-      const data = await res.json();
-      if (data.success) {
-        setProfile(data.profile);
-        setProfileForm(data.profile);
-        showToast('Heading & Profile updated successfully in Postgres!');
-      }
+      const data = await parseApiResponse<{ success: true; profile: ProfileData }>(res);
+      setProfile(data.profile);
+      setProfileForm(data.profile);
+      showToast('Heading & Profile updated successfully in Postgres!');
     } catch (err: any) {
       alert('Error updating profile: ' + err.message);
     }
@@ -300,12 +312,10 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedSeo),
       });
-      const data = await res.json();
-      if (data.success) {
-        setSeoForm(data.seo);
-        showToast('SEO & Social metadata saved to PostgreSQL!');
-        confetti({ particleCount: 40, spread: 40, origin: { y: 0.6 } });
-      }
+      const data = await parseApiResponse<{ success: true; seo: SeoSettingsData }>(res);
+      setSeoForm(data.seo);
+      showToast('SEO & Social metadata saved to PostgreSQL!');
+      confetti({ particleCount: 40, spread: 40, origin: { y: 0.6 } });
     } catch (err: any) {
       alert('Error saving SEO settings: ' + err.message);
     } finally {

@@ -215,7 +215,7 @@ export default function ContactSection() {
               {status === 'submitting' ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Saving to PostgreSQL...</span>
+                  <span>Sending...</span>
                 </>
               ) : (
                 <>

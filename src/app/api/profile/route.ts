@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getProfile, updateProfile, getExperiences, getEducations, getSkills } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     const [profile, experiences, educations, skills] = await Promise.all([

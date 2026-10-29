@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSeoSettings, updateSeoSettings } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     const seo = await getSeoSettings();
@@ -20,4 +23,3 @@ export async function PUT(req: Request) {
     return NextResponse.json({ success: false, error: error.message || 'Failed to update SEO settings' }, { status: 500 });
   }
 }
-
