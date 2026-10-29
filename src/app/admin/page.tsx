@@ -75,6 +75,8 @@ export default function AdminPage() {
 
   // Edit Modals
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [projectImageFile, setProjectImageFile] = useState<File | null>(null);
+  const [projectImageProgress, setProjectImageProgress] = useState<number | null>(null);
   const [editingExperience, setEditingExperience] = useState<ExperienceItem | null>(null);
   const [editingEducation, setEditingEducation] = useState<EducationItem | null>(null);
 
@@ -988,6 +990,8 @@ export default function AdminPage() {
                   metrics: '99.9% Uptime',
                   order: projects.length + 1,
                 };
+                setProjectImageFile(null);
+                setProjectImageProgress(null);
                 setEditingProject(newP);
               }}
               className="px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md flex items-center gap-1.5 cursor-pointer"
@@ -1657,13 +1661,29 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Image URL</label>
-                <input
-                  type="text"
-                  value={editingProject.imageUrl}
-                  onChange={(e) => setEditingProject({ ...editingProject, imageUrl: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
-                />
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Project Image</label>
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-semibold cursor-pointer hover:bg-indigo-100">
+                    <Upload className="w-4 h-4" />
+                    <span>{projectImageFile ? 'Choose another image' : 'Upload image'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => setProjectImageFile(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                  {projectImageFile && <span className="text-xs text-slate-500 truncate">{projectImageFile.name}</span>}
+                </div>
+                {editingProject.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={editingProject.imageUrl} alt="Current project" className="mt-3 h-24 w-40 rounded-xl object-cover border border-slate-200" />
+                )}
+                {projectImageProgress !== null && (
+                  <div className="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-indigo-600 h-1.5 rounded-full transition-all" style={{ width: `${projectImageProgress}%` }} />
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1709,12 +1729,24 @@ export default function AdminPage() {
                 <button
                   onClick={async () => {
                     try {
+                      let finalImageUrl = editingProject.imageUrl;
+                      if (projectImageFile) {
+                        finalImageUrl = await uploadPortfolioFile(projectImageFile, 'project-photos', (progress) => {
+                          setProjectImageProgress(progress);
+                        });
+                      }
+                      const projectPayload = {
+                        ...editingProject,
+                        imageUrl: finalImageUrl,
+                        demoUrl: editingProject.demoUrl?.trim() || null,
+                        githubUrl: editingProject.githubUrl?.trim() || null,
+                      };
                       const isNew = !projects.some((p) => p.id === editingProject.id);
                       if (isNew) {
                         const res = await fetch('/api/projects', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(editingProject),
+                          body: JSON.stringify(projectPayload),
                         });
                         const d = await res.json();
                         if (!d.success) throw new Error(d.error || 'Failed to create project');
@@ -1723,7 +1755,7 @@ export default function AdminPage() {
                         const res = await fetch(`/api/projects/${editingProject.id}`, {
                           method: 'PUT',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(editingProject),
+                          body: JSON.stringify(projectPayload),
                         });
                         const d = await res.json();
                         if (!d.success) throw new Error(d.error || 'Failed to update project');
@@ -1731,6 +1763,8 @@ export default function AdminPage() {
                       }
                       showToast('Project saved to PostgreSQL');
                       setEditingProject(null);
+                      setProjectImageFile(null);
+                      setProjectImageProgress(null);
                     } catch (error) {
                       console.error('Error saving project:', error);
                       showToast(error instanceof Error ? error.message : 'Failed to save project');

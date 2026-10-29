@@ -29,8 +29,8 @@ export async function POST(req: Request) {
       tags: Array.isArray(tags) ? tags : typeof tags === 'string' ? tags.split(',').map((t: string) => t.trim()) : [],
       featured: true,
       imageUrl,
-      demoUrl: demoUrl || '',
-      githubUrl: githubUrl || '',
+      demoUrl: typeof demoUrl === 'string' && demoUrl.trim() ? demoUrl.trim() : null,
+      githubUrl: typeof githubUrl === 'string' && githubUrl.trim() ? githubUrl.trim() : null,
       stars: 1,
       metrics: metrics || 'New Launch',
       order: 0,
@@ -42,4 +42,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: 'Failed to create project' }, { status: 500 });
   }
 }
-

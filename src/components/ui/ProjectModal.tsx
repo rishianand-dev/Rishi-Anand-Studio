@@ -80,9 +80,9 @@ export default function ProjectModal() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-slate-200/70">
-          {selectedProject.demoUrl && (
+          {selectedProject.demoUrl?.trim() && (
             <a
-              href={selectedProject.demoUrl}
+              href={selectedProject.demoUrl.trim()}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-colors"
@@ -91,9 +91,9 @@ export default function ProjectModal() {
               <span>Launch Live Preview</span>
             </a>
           )}
-          {selectedProject.githubUrl && (
+          {selectedProject.githubUrl?.trim() && (
             <a
-              href={selectedProject.githubUrl}
+              href={selectedProject.githubUrl.trim()}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full liquid-badge hover:bg-white text-slate-800 text-xs font-semibold transition-colors"

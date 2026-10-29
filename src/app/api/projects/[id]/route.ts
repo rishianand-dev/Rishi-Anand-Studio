@@ -5,7 +5,11 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   try {
     const { id } = params;
     const body = await req.json();
-    const updated = await updateProject(id, body);
+    const updated = await updateProject(id, {
+      ...body,
+      ...(typeof body.demoUrl === 'string' ? { demoUrl: body.demoUrl.trim() || null } : {}),
+      ...(typeof body.githubUrl === 'string' ? { githubUrl: body.githubUrl.trim() || null } : {}),
+    });
     return NextResponse.json({ success: true, project: updated });
   } catch (error: any) {
     console.error('Error updating project:', error);
@@ -23,4 +27,3 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     return NextResponse.json({ success: false, error: error.message || 'Failed to delete project' }, { status: 500 });
   }
 }
-
