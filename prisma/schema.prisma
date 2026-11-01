@@ -111,6 +111,12 @@ model Profile {
   updatedAt        DateTime @updatedAt
 }
 
+model ThemeSettings {
+  id          String   @id @default("default-theme")
+  accentColor String  @default("#4f46e5")
+  updatedAt   DateTime @updatedAt
+}
+
 model SeoSettings {
   id              String   @id @default("default-seo")
   metaTitle       String   @default("Alex Miller — Liquid Glass Engineer Portfolio")

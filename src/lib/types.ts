@@ -95,6 +95,11 @@ export interface ProfileData {
   techStackCategoryOrder: string;
 }
 
+export interface ThemeSettingsData {
+  id: string;
+  accentColor: string;
+}
+
 export interface SeoSettingsData {
   id: string;
   metaTitle: string;

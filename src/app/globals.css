@@ -5,6 +5,16 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
+  --accent-color: #4f46e5;
+  --accent-50: color-mix(in srgb, var(--accent-color) 8%, white);
+  --accent-100: color-mix(in srgb, var(--accent-color) 16%, white);
+  --accent-200: color-mix(in srgb, var(--accent-color) 30%, white);
+  --accent-300: color-mix(in srgb, var(--accent-color) 52%, white);
+  --accent-500: var(--accent-color);
+  --accent-600: color-mix(in srgb, var(--accent-color) 88%, black);
+  --accent-700: color-mix(in srgb, var(--accent-color) 72%, black);
+  --accent-900: color-mix(in srgb, var(--accent-color) 42%, black);
+  --accent-gradient: linear-gradient(135deg, var(--accent-color), color-mix(in srgb, var(--accent-color) 65%, #111827));
   --glass-bg: rgba(255, 255, 255, 0.65);
   --glass-border: rgba(255, 255, 255, 0.8);
   --glass-border-subtle: rgba(226, 232, 240, 0.6);
@@ -18,6 +28,23 @@
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-border-subtle: rgba(255, 255, 255, 0.06);
   --glass-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.5);
+}
+
+.dark body {
+  background-color: var(--background);
+}
+
+.dark .liquid-glass-nav,
+.dark .liquid-glass-card,
+.dark .liquid-badge {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.dark .liquid-glass-card:hover {
+  background: rgba(30, 34, 48, 0.8);
+  border-color: rgba(129, 140, 248, 0.5);
 }
 
 body {
@@ -80,10 +107,38 @@ body {
 }
 
 .text-gradient-purple {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.accent-gradient {
+  background: var(--accent-gradient);
+}
+
+::selection {
+  background: var(--accent-500);
+  color: white;
+}
+
+.bg-indigo-50 { background-color: var(--accent-50) !important; }
+.bg-indigo-600 { background-color: var(--accent-600) !important; }
+.text-indigo-600 { color: var(--accent-600) !important; }
+.text-indigo-700 { color: var(--accent-700) !important; }
+.text-indigo-900 { color: var(--accent-900) !important; }
+.border-indigo-100 { border-color: var(--accent-100) !important; }
+.border-indigo-200\/70 { border-color: color-mix(in srgb, var(--accent-200) 70%, transparent) !important; }
+.ring-indigo-500\/40 { --tw-ring-color: color-mix(in srgb, var(--accent-500) 40%, transparent) !important; }
+.ring-indigo-500\/50 { --tw-ring-color: color-mix(in srgb, var(--accent-500) 50%, transparent) !important; }
+.shadow-indigo-500\/25 { --tw-shadow-color: color-mix(in srgb, var(--accent-500) 25%, transparent) !important; }
+.hover\:bg-indigo-500:hover { background-color: var(--accent-500) !important; }
+.hover\:bg-indigo-100:hover { background-color: var(--accent-100) !important; }
+.hover\:text-indigo-600:hover { color: var(--accent-600) !important; }
+.hover\:text-indigo-900:hover { color: var(--accent-900) !important; }
+.from-indigo-600 { --tw-gradient-from: var(--accent-600) var(--tw-gradient-from-position); }
+.to-indigo-700 { --tw-gradient-to: var(--accent-700) var(--tw-gradient-to-position); }
+.hover\:from-indigo-500:hover { --tw-gradient-from: var(--accent-500) var(--tw-gradient-from-position); }
+.hover\:to-indigo-600:hover { --tw-gradient-to: var(--accent-600) var(--tw-gradient-to-position); }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -99,4 +154,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(129, 140, 248, 0.7);
 }
-

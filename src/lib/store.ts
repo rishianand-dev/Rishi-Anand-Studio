@@ -6,6 +6,9 @@ const sortByOrder = <T extends { order: number }>(items: T[]) =>
   [...items].sort((a, b) => a.order - b.order);
 
 interface PortfolioState {
+  accentColor: string;
+  setAccentColor: (color: string) => void;
+
   // Navigation & Sections
   activeSection: string;
   setActiveSection: (section: string) => void;
@@ -59,6 +62,9 @@ interface PortfolioState {
 }
 
 export const usePortfolioStore = create<PortfolioState>((set) => ({
+  accentColor: '#4f46e5',
+  setAccentColor: (accentColor) => set({ accentColor }),
+
   activeSection: 'work',
   setActiveSection: (section) => set({ activeSection: section }),
 

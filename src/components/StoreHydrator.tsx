@@ -43,8 +43,18 @@ export default function StoreHydrator({
       setProfile(serverProfile);
       hydrated.current = true;
     }
-  }, [serverProjects, serverExperiences, serverEducations, serverSkills, serverProfile, setProjects, setExperiences, setEducations, setSkills, setProfile]);
+  }, [
+    serverProjects,
+    serverExperiences,
+    serverEducations,
+    serverSkills,
+    serverProfile,
+    setProjects,
+    setExperiences,
+    setEducations,
+    setSkills,
+    setProfile,
+  ]);
 
   return <>{children}</>;
 }
-

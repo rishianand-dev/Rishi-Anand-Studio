@@ -28,9 +28,10 @@ import {
   Search,
   Globe,
   Share2,
+  Palette,
 } from 'lucide-react';
 import { usePortfolioStore } from '@/lib/store';
-import { Project, ExperienceItem, EducationItem, SkillItem, ProfileData, SeoSettingsData } from '@/lib/types';
+import { Project, ExperienceItem, EducationItem, SkillItem, ProfileData, SeoSettingsData, ThemeSettingsData } from '@/lib/types';
 import { INITIAL_SEO } from '@/lib/initial-data';
 import { uploadPortfolioFile } from '@/lib/upload';
 import confetti from 'canvas-confetti';
@@ -40,6 +41,7 @@ export default function AdminPage() {
   const {
     profile,
     setProfile,
+    setAccentColor,
     projects,
     setProjects,
     addProject,
@@ -68,7 +70,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'heading' | 'about' | 'footer' | 'projects' | 'tech' | 'experience' | 'education' | 'seo'>('heading');
+  const [activeTab, setActiveTab] = useState<'heading' | 'about' | 'footer' | 'projects' | 'tech' | 'experience' | 'education' | 'seo' | 'appearance'>('heading');
 
   // Notification Toast
   const [toast, setToast] = useState<string | null>(null);
@@ -92,6 +94,8 @@ export default function AdminPage() {
   const [ogUploading, setOgUploading] = useState(false);
   const [ogProgress, setOgProgress] = useState<number | null>(null);
   const [seoSaving, setSeoSaving] = useState(false);
+  const [themeForm, setThemeForm] = useState<ThemeSettingsData>({ id: 'default-theme', accentColor: '#4f46e5' });
+  const [themeSaving, setThemeSaving] = useState(false);
   const techCategories = profileForm.techStackCategoryOrder
     .split(',')
     .map((category) => category.trim())
@@ -115,10 +119,11 @@ export default function AdminPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [profileRes, projectsRes, seoRes] = await Promise.all([
+        const [profileRes, projectsRes, seoRes, themeRes] = await Promise.all([
           fetch('/api/profile'),
           fetch('/api/projects'),
           fetch('/api/seo'),
+          fetch('/api/theme'),
         ]);
 
         const data = await profileRes.json();
@@ -140,6 +145,11 @@ export default function AdminPage() {
         const seoData = await seoRes.json();
         if (seoData.success && seoData.seo) {
           setSeoForm(seoData.seo);
+        }
+
+        const themeData = await themeRes.json();
+        if (themeData.success && themeData.theme) {
+          setThemeForm(themeData.theme);
         }
       } catch (err) {
         console.error(err);
@@ -267,6 +277,25 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error saving tech stack category order:', error);
       showToast(error instanceof Error ? error.message : 'Could not save category order');
+    }
+  };
+
+  const handleThemeSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setThemeSaving(true);
+    try {
+      const res = await fetch('/api/theme', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(themeForm),
+      });
+      const data = await parseApiResponse<{ success: true; theme: ThemeSettingsData }>(res);
+      setThemeForm(data.theme);
+      showToast('Accent color saved successfully');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Could not save accent color');
+    } finally {
+      setThemeSaving(false);
     }
   };
 
@@ -574,6 +603,16 @@ export default function AdminPage() {
         >
           <Search className="w-4 h-4" />
           <span>SEO & Metadata</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('appearance')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            activeTab === 'appearance' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          <Palette className="w-4 h-4" />
+          <span>Appearance</span>
         </button>
       </div>
 
@@ -1359,7 +1398,78 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* TAB CONTENT 6: SEO & SOCIAL METADATA */}
+      {/* TAB CONTENT 6: APPEARANCE */}
+      {activeTab === 'appearance' && (
+        <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
+          <div className="flex items-center gap-3 pb-4 border-b border-slate-200/60 mb-6">
+            <Palette className="w-5 h-5 text-indigo-600" />
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Appearance</h2>
+              <p className="text-xs text-slate-500">
+                Choose the accent color used by buttons, links, gradients, icons, and highlights.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleThemeSave} className="max-w-2xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-5">
+              <div>
+                <label htmlFor="accent-color" className="block text-xs font-semibold uppercase text-slate-700 mb-2">
+                  Accent color
+                </label>
+                <input
+                  id="accent-color"
+                  type="color"
+                  value={themeForm.accentColor}
+                  onChange={(e) => {
+                    setThemeForm({ ...themeForm, accentColor: e.target.value });
+                    setAccentColor(e.target.value);
+                  }}
+                  className="block w-20 h-14 rounded-xl border border-slate-200 bg-white p-1 cursor-pointer"
+                />
+              </div>
+              <div className="flex-1">
+                <label htmlFor="accent-hex" className="block text-xs font-semibold uppercase text-slate-700 mb-2">
+                  Hex value
+                </label>
+                <input
+                  id="accent-hex"
+                  type="text"
+                  value={themeForm.accentColor}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setThemeForm({ ...themeForm, accentColor: value });
+                    if (/^#[0-9a-f]{6}$/i.test(value)) setAccentColor(value);
+                  }}
+                  pattern="^#[0-9a-fA-F]{6}$"
+                  placeholder="#4f46e5"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-mono focus:ring-2 focus:ring-indigo-500/40 outline-none"
+                />
+              </div>
+            </div>
+            <div className="rounded-2xl p-5 border border-slate-200/80 bg-slate-50/70">
+              <p className="text-xs text-slate-500 mb-3">Live preview</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-semibold">
+                  Primary button
+                </span>
+                <span className="text-gradient-purple text-lg font-bold">Accent headline</span>
+                <span className="w-8 h-8 rounded-full" style={{ backgroundColor: themeForm.accentColor }} />
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={themeSaving || !/^#[0-9a-f]{6}$/i.test(themeForm.accentColor)}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md disabled:opacity-50"
+            >
+              {themeSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save appearance
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* TAB CONTENT 7: SEO & SOCIAL METADATA */}
       {activeTab === 'seo' && (
         <div className="space-y-8">
           <div className="flex items-center justify-between pb-4 border-b border-slate-200/60">

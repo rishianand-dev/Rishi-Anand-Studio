@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { INITIAL_PROJECTS, INITIAL_EXPERIENCE, INITIAL_PROFILE, INITIAL_EDUCATION, INITIAL_SKILLS, INITIAL_SEO } from './initial-data';
-import { Project, ExperienceItem, ContactSubmission, ProfileData, EducationItem, SkillItem, SeoSettingsData } from './types';
+import { INITIAL_PROJECTS, INITIAL_EXPERIENCE, INITIAL_PROFILE, INITIAL_EDUCATION, INITIAL_SKILLS, INITIAL_SEO, INITIAL_THEME } from './initial-data';
+import { Project, ExperienceItem, ContactSubmission, ProfileData, EducationItem, SkillItem, SeoSettingsData, ThemeSettingsData } from './types';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -25,6 +25,39 @@ let memorySkills: SkillItem[] = [...INITIAL_SKILLS];
 let memoryMessages: ContactSubmission[] = [];
 let memoryProfile: ProfileData = { ...INITIAL_PROFILE };
 let memorySeo: SeoSettingsData = { ...INITIAL_SEO };
+let memoryTheme: ThemeSettingsData = { ...INITIAL_THEME };
+
+const isHexColor = (value: string): boolean => /^#[0-9a-f]{6}$/i.test(value);
+
+export async function getThemeSettings(): Promise<ThemeSettingsData> {
+  try {
+    const theme = await prisma.themeSettings.findUnique({ where: { id: 'default-theme' } });
+    if (theme && isHexColor(theme.accentColor)) {
+      return { id: theme.id, accentColor: theme.accentColor };
+    }
+    return memoryTheme;
+  } catch {
+    return memoryTheme;
+  }
+}
+
+export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Promise<ThemeSettingsData> {
+  const accentColor = data.accentColor ?? memoryTheme.accentColor;
+  if (!isHexColor(accentColor)) {
+    throw new Error('Accent color must be a six-digit hex color');
+  }
+  try {
+    const updated = await prisma.themeSettings.upsert({
+      where: { id: 'default-theme' },
+      update: { accentColor },
+      create: { id: 'default-theme', accentColor },
+    });
+    memoryTheme = { id: updated.id, accentColor: updated.accentColor };
+  } catch {
+    memoryTheme = { ...memoryTheme, accentColor };
+  }
+  return memoryTheme;
+}
 
 // ---------------- SEO SETTINGS ----------------
 export async function getSeoSettings(): Promise<SeoSettingsData> {

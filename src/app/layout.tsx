@@ -5,7 +5,8 @@ import Footer from '@/components/ui/Footer';
 import AmbientBackground from '@/components/ui/AmbientBackground';
 import ProjectModal from '@/components/ui/ProjectModal';
 import AdminDrawer from '@/components/ui/AdminDrawer';
-import { getSeoSettings } from '@/lib/db';
+import ThemeController from '@/components/ThemeController';
+import { getProfile, getSeoSettings, getThemeSettings } from '@/lib/db';
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoSettings();
@@ -46,14 +47,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [profile, theme] = await Promise.all([getProfile(), getThemeSettings()]);
+
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="antialiased selection:bg-indigo-500 selection:text-white">
+      <body className="antialiased selection:text-white">
+        <ThemeController initialColor={theme.accentColor} />
         <AmbientBackground />
         <Navbar />
         <main className="relative z-10">{children}</main>

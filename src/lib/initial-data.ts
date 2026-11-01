@@ -1,4 +1,4 @@
-import { Project, ExperienceItem, ProfileData, EducationItem, SkillItem, SeoSettingsData } from './types';
+import { Project, ExperienceItem, ProfileData, EducationItem, SkillItem, SeoSettingsData, ThemeSettingsData } from './types';
 
 export const INITIAL_PROFILE: ProfileData = {
   id: 'default-profile',
@@ -39,6 +39,11 @@ export const INITIAL_PROFILE: ProfileData = {
   heroStatusLabel: 'CURRENTLY',
   heroStatusText: 'Building for the web',
   techStackCategoryOrder: 'Frontend,Backend,Practices',
+};
+
+export const INITIAL_THEME: ThemeSettingsData = {
+  id: 'default-theme',
+  accentColor: '#4f46e5',
 };
 
 export const INITIAL_SEO: SeoSettingsData = {

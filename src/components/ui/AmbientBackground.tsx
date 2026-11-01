@@ -7,7 +7,7 @@ export default function AmbientBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
       {/* Light aesthetic base canvas */}
-      <div className="absolute inset-0 bg-[#f7f8fc]" />
+      <div className="absolute inset-0 bg-[var(--background)]" />
 
       {/* Primary Top Right Iris Glow */}
       <motion.div
@@ -63,4 +63,3 @@ export default function AmbientBackground() {
     </div>
   );
 }
-
