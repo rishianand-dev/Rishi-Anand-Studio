@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Mail, Send, Paperclip, CheckCircle2, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { uploadPortfolioFile } from '@/lib/upload';
+import { usePortfolioStore } from '@/lib/store';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ export default function ContactSection() {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const accentColor = usePortfolioStore((state) => state.accentColor);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -56,7 +58,7 @@ export default function ContactSection() {
         particleCount: 80,
         spread: 60,
         origin: { y: 0.7 },
-        colors: ['#6366f1', '#8b5cf6', '#ec4899', '#3b82f6'],
+        colors: [accentColor, '#ffffff'],
       });
 
       // Reset form

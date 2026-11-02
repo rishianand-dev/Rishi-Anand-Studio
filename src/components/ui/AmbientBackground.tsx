@@ -20,7 +20,7 @@ export default function AmbientBackground() {
         transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute -top-[15%] right-[-5%] w-[750px] h-[750px] rounded-full blur-[110px]"
         style={{
-          background: 'radial-gradient(circle, rgba(165, 180, 252, 0.7) 0%, rgba(199, 210, 254, 0.3) 50%, transparent 70%)',
+          background: 'radial-gradient(circle, color-mix(in srgb, var(--accent-color) 35%, transparent) 0%, color-mix(in srgb, var(--accent-color) 15%, transparent) 50%, transparent 70%)',
         }}
       />
 
@@ -35,7 +35,7 @@ export default function AmbientBackground() {
         transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         className="absolute top-[25%] -left-[10%] w-[650px] h-[650px] rounded-full blur-[130px]"
         style={{
-          background: 'radial-gradient(circle, rgba(224, 231, 255, 0.8) 0%, rgba(243, 232, 255, 0.4) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, color-mix(in srgb, var(--accent-color) 20%, transparent) 0%, color-mix(in srgb, var(--accent-color) 8%, transparent) 60%, transparent 80%)',
         }}
       />
 
@@ -48,7 +48,7 @@ export default function AmbientBackground() {
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
         className="absolute bottom-[-10%] left-[20%] w-[800px] h-[600px] rounded-full blur-[140px]"
         style={{
-          background: 'radial-gradient(circle, rgba(196, 181, 253, 0.5) 0%, rgba(224, 231, 255, 0.2) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, color-mix(in srgb, var(--accent-color) 25%, transparent) 0%, color-mix(in srgb, var(--accent-color) 10%, transparent) 60%, transparent 80%)',
         }}
       />
 
