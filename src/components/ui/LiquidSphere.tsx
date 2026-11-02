@@ -43,9 +43,9 @@ export default function LiquidSphere() {
     >
       {/* Concentric orbital rings */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[125%] h-[125%] rounded-full border border-indigo-200/40 opacity-70 animate-pulse-subtle" />
-        <div className="absolute w-[105%] h-[105%] rounded-full border border-indigo-300/30" />
-        <div className="absolute w-[85%] h-[85%] rounded-full border border-purple-200/40" />
+        <div className="w-[125%] h-[125%] rounded-full opacity-70 animate-pulse-subtle" style={{ border: '1px solid color-mix(in srgb, var(--accent-color) 8%, transparent)' }} />
+        <div className="absolute w-[105%] h-[105%] rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--accent-color) 6%, transparent)' }} />
+        <div className="absolute w-[85%] h-[85%] rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--accent-color) 7%, transparent)' }} />
       </div>
 
       {/* Main Liquid Glass 3D Sphere */}
@@ -61,21 +61,26 @@ export default function LiquidSphere() {
         <div
           className="absolute -inset-4 rounded-full blur-2xl opacity-60 pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(124, 58, 237, 0.45) 0%, rgba(99, 102, 241, 0.15) 60%, transparent 80%)',
+            background: 'radial-gradient(circle, color-mix(in srgb, var(--accent-color) 45%, transparent) 0%, color-mix(in srgb, var(--accent-color) 15%, transparent) 60%, transparent 80%)',
             transform: 'translateY(25px) scale(0.95)',
           }}
         />
 
         {/* Outer refractive glow */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-400 opacity-95 shadow-2xl overflow-hidden">
+        <div
+          className="absolute inset-0 rounded-full opacity-95 shadow-2xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 55%, white), color-mix(in srgb, var(--accent-color) 90%, black), color-mix(in srgb, var(--accent-color) 70%, black))',
+          }}
+        >
           {/* Internal volumetric refraction gradient */}
           <div
             className="absolute inset-0 rounded-full"
             style={{
               background: `
                 radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.2) 20%, transparent 55%),
-                radial-gradient(circle at 75% 75%, rgba(67, 56, 202, 0.9) 0%, rgba(109, 40, 217, 0.7) 40%, transparent 70%),
-                linear-gradient(135deg, #818cf8 0%, #7c3aed 50%, #4338ca 100%)
+                radial-gradient(circle at 75% 75%, color-mix(in srgb, var(--accent-color) 90%, black) 0%, color-mix(in srgb, var(--accent-color) 70%, black) 40%, transparent 70%),
+                linear-gradient(135deg, color-mix(in srgb, var(--accent-color) 55%, white) 0%, var(--accent-color) 50%, color-mix(in srgb, var(--accent-color) 72%, black) 100%)
               `,
             }}
           />
@@ -92,7 +97,7 @@ export default function LiquidSphere() {
           <div
             className="absolute bottom-[8%] right-[14%] w-[90px] h-[60px] rounded-full blur-[8px] opacity-70 pointer-events-none"
             style={{
-              background: 'radial-gradient(ellipse at center, rgba(199, 210, 254, 0.7) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--accent-color) 45%, white) 0%, transparent 70%)',
             }}
           />
         </div>

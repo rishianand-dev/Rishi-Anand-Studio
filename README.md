@@ -29,7 +29,7 @@ Designed and implemented with **Next.js 14 (App Router)**, **TypeScript**, **Tai
   - **About Section:** "Access Resume (PDF)" direct download button.
 - **PostgreSQL Database:**
   - Prisma schema with models for `Project`, `Experience`, `Education`, `Skill`, `ContactMessage`, and `Profile`.
-  - Migration and seed scripts (`scripts/seed.mjs`).
+  - Prisma schema management through `prisma db push`.
   - Resilient database adapter (`src/lib/db.ts`) with zero-downtime fallback for seamless local previews.
 - **Neon File & Photo Storage:**
   - S3-compatible server-side storage integration for project screenshots, resume PDFs, SEO images, and contact attachments.
@@ -62,11 +62,10 @@ AWS_SECRET_ACCESS_KEY=""
 AWS_REGION=""
 ```
 
-### 3. Database Migration & Seeding (PostgreSQL)
+### 3. Database Setup (PostgreSQL)
 When your PostgreSQL database is running:
 ```bash
 npx prisma db push
-npm run seed
 ```
 
 ### 4. Run Development Server

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { Project, ExperienceItem, ProfileData, EducationItem, SkillItem } from './types';
-import { INITIAL_PROJECTS, INITIAL_EXPERIENCE, INITIAL_PROFILE, INITIAL_EDUCATION, INITIAL_SKILLS } from './initial-data';
+import { Project, ExperienceItem, ProfileData, EducationItem, SkillItem, EMPTY_PROFILE } from './types';
 
 const sortByOrder = <T extends { order: number }>(items: T[]) =>
   [...items].sort((a, b) => a.order - b.order);
@@ -86,7 +85,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
   liquidGlow: true,
   toggleLiquidGlow: () => set((state) => ({ liquidGlow: !state.liquidGlow })),
 
-  projects: INITIAL_PROJECTS,
+  projects: [],
   setProjects: (projects) => set({ projects: sortByOrder(projects) }),
   addProject: (project) =>
     set((state) => ({
@@ -101,7 +100,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
       projects: state.projects.filter((p) => p.id !== id),
     })),
 
-  experiences: INITIAL_EXPERIENCE,
+  experiences: [],
   setExperiences: (experiences) => set({ experiences: sortByOrder(experiences) }),
   addExperience: (exp) =>
     set((state) => ({
@@ -116,7 +115,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
       experiences: state.experiences.filter((e) => e.id !== id),
     })),
 
-  educations: INITIAL_EDUCATION,
+  educations: [],
   setEducations: (educations) => set({ educations: sortByOrder(educations) }),
   addEducation: (edu) =>
     set((state) => ({
@@ -131,7 +130,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
       educations: state.educations.filter((e) => e.id !== id),
     })),
 
-  skills: INITIAL_SKILLS,
+  skills: [],
   setSkills: (skills) => set({ skills: sortByOrder(skills) }),
   addSkill: (skill) =>
     set((state) => ({
@@ -146,7 +145,7 @@ export const usePortfolioStore = create<PortfolioState>((set) => ({
       skills: state.skills.filter((s) => s.id !== id),
     })),
 
-  profile: INITIAL_PROFILE,
+  profile: EMPTY_PROFILE,
   setProfile: (profile) => set({ profile }),
   updateProfileInStore: (partial) =>
     set((state) => ({

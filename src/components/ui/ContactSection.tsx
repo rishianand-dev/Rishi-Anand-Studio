@@ -118,7 +118,7 @@ export default function ContactSection() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Alex Rivers"
-                  className="w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm placeholder:text-slate-400 transition-all"
+                  className="accent-focus w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 text-sm placeholder:text-slate-400 transition-all"
                 />
               </div>
 
@@ -132,7 +132,7 @@ export default function ContactSection() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="alex@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm placeholder:text-slate-400 transition-all"
+                  className="accent-focus w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 text-sm placeholder:text-slate-400 transition-all"
                 />
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function ContactSection() {
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="Senior Engineering Role / Project Inquiry"
-                className="w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm placeholder:text-slate-400 transition-all"
+                className="accent-focus w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 text-sm placeholder:text-slate-400 transition-all"
               />
             </div>
 
@@ -160,7 +160,7 @@ export default function ContactSection() {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Tell me about your team, tech stack, or product vision..."
-                className="w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm placeholder:text-slate-400 transition-all resize-none"
+                className="accent-focus w-full px-4 py-3 rounded-xl bg-white/80 border border-slate-200/80 text-sm placeholder:text-slate-400 transition-all resize-none"
               />
             </div>
 
@@ -171,7 +171,7 @@ export default function ContactSection() {
                 
               </label>
               <div className="flex items-center gap-3">
-                <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/70 hover:bg-white border border-slate-200/70 text-xs font-medium text-slate-700 transition-all">
+                <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/70 hover:bg-indigo-50 border border-slate-200/70 text-xs font-medium text-slate-700 transition-all">
                   <Paperclip className="w-4 h-4 text-indigo-600" />
                   <span>{file ? file.name : 'Choose File (PDF, PNG, Specs)'}</span>
                   <input
@@ -212,7 +212,7 @@ export default function ContactSection() {
             <button
               type="submit"
               disabled={status === 'submitting'}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold text-sm shadow-lg shadow-indigo-500/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+              className="accent-submit-button w-full py-3.5 rounded-xl text-white font-semibold text-sm shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
             >
               {status === 'submitting' ? (
                 <>

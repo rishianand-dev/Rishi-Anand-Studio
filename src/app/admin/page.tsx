@@ -32,7 +32,6 @@ import {
 } from 'lucide-react';
 import { usePortfolioStore } from '@/lib/store';
 import { Project, ExperienceItem, EducationItem, SkillItem, ProfileData, SeoSettingsData, ThemeSettingsData } from '@/lib/types';
-import { INITIAL_SEO } from '@/lib/initial-data';
 import { uploadPortfolioFile } from '@/lib/upload';
 import confetti from 'canvas-confetti';
 
@@ -89,7 +88,13 @@ export default function AdminPage() {
   const [resumeProgress, setResumeProgress] = useState<number | null>(null);
 
   // SEO Form state
-  const [seoForm, setSeoForm] = useState<SeoSettingsData>(INITIAL_SEO);
+  const [seoForm, setSeoForm] = useState<SeoSettingsData>({
+    id: 'default-seo',
+    metaTitle: '',
+    metaDescription: '',
+    keywords: '',
+    robots: '',
+  });
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogUploading, setOgUploading] = useState(false);
   const [ogProgress, setOgProgress] = useState<number | null>(null);

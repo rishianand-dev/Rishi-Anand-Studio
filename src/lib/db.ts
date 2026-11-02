@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { INITIAL_PROJECTS, INITIAL_EXPERIENCE, INITIAL_PROFILE, INITIAL_EDUCATION, INITIAL_SKILLS, INITIAL_SEO, INITIAL_THEME } from './initial-data';
-import { Project, ExperienceItem, ContactSubmission, ProfileData, EducationItem, SkillItem, SeoSettingsData, ThemeSettingsData } from './types';
+import { Project, ExperienceItem, ContactSubmission, ProfileData, EducationItem, SkillItem, SeoSettingsData, ThemeSettingsData, EMPTY_PROFILE } from './types';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -18,14 +17,14 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // In-memory persistent cache for fallback when Postgres isn't running or during build
-let memoryProjects: Project[] = [...INITIAL_PROJECTS];
-let memoryExperience: ExperienceItem[] = [...INITIAL_EXPERIENCE];
-let memoryEducation: EducationItem[] = [...INITIAL_EDUCATION];
-let memorySkills: SkillItem[] = [...INITIAL_SKILLS];
+let memoryProjects: Project[] = [];
+let memoryExperience: ExperienceItem[] = [];
+let memoryEducation: EducationItem[] = [];
+let memorySkills: SkillItem[] = [];
 let memoryMessages: ContactSubmission[] = [];
-let memoryProfile: ProfileData = { ...INITIAL_PROFILE };
-let memorySeo: SeoSettingsData = { ...INITIAL_SEO };
-let memoryTheme: ThemeSettingsData = { ...INITIAL_THEME };
+let memoryProfile: ProfileData = { ...EMPTY_PROFILE };
+let memorySeo: SeoSettingsData = { id: 'default-seo', metaTitle: '', metaDescription: '', keywords: '', robots: '' };
+let memoryTheme: ThemeSettingsData = { id: 'default-theme', accentColor: '#4f46e5' };
 
 const isHexColor = (value: string): boolean => /^#[0-9a-f]{6}$/i.test(value);
 
@@ -97,13 +96,13 @@ export async function updateSeoSettings(data: Partial<SeoSettingsData>): Promise
       },
       create: {
         id: 'default-seo',
-        metaTitle: data.metaTitle ?? INITIAL_SEO.metaTitle,
-        metaDescription: data.metaDescription ?? INITIAL_SEO.metaDescription,
-        keywords: data.keywords ?? INITIAL_SEO.keywords,
-        ogImageUrl: data.ogImageUrl ?? INITIAL_SEO.ogImageUrl,
-        canonicalUrl: data.canonicalUrl ?? INITIAL_SEO.canonicalUrl,
-        twitterHandle: data.twitterHandle ?? INITIAL_SEO.twitterHandle,
-        robots: data.robots ?? INITIAL_SEO.robots,
+        metaTitle: data.metaTitle ?? '',
+        metaDescription: data.metaDescription ?? '',
+        keywords: data.keywords ?? '',
+        ogImageUrl: data.ogImageUrl ?? null,
+        canonicalUrl: data.canonicalUrl ?? null,
+        twitterHandle: data.twitterHandle ?? null,
+        robots: data.robots ?? '',
       },
     });
     memorySeo = { ...memorySeo, ...updated };
@@ -212,42 +211,42 @@ export async function updateProfile(data: Partial<ProfileData>): Promise<Profile
       },
       create: {
         id: 'default-profile',
-        name: data.name ?? INITIAL_PROFILE.name,
-        role: data.role ?? INITIAL_PROFILE.role,
-        location: data.location ?? INITIAL_PROFILE.location,
-        headline: data.headline ?? INITIAL_PROFILE.headline,
-        subheadline: data.subheadline ?? INITIAL_PROFILE.subheadline,
+        name: data.name ?? current.name,
+        role: data.role ?? current.role,
+        location: data.location ?? current.location,
+        headline: data.headline ?? current.headline,
+        subheadline: data.subheadline ?? current.subheadline,
         availableForWork: data.availableForWork ?? true,
-        resumeUrl: data.resumeUrl ?? INITIAL_PROFILE.resumeUrl,
-        githubUrl: data.githubUrl ?? INITIAL_PROFILE.githubUrl,
-        linkedinUrl: data.linkedinUrl ?? INITIAL_PROFILE.linkedinUrl,
-        twitterUrl: data.twitterUrl ?? INITIAL_PROFILE.twitterUrl,
-        contactEmail: data.contactEmail ?? INITIAL_PROFILE.contactEmail,
-        footerBrand: data.footerBrand ?? INITIAL_PROFILE.footerBrand,
-        footerLabel: data.footerLabel ?? INITIAL_PROFILE.footerLabel,
-        footerCopyright: data.footerCopyright ?? INITIAL_PROFILE.footerCopyright,
-        footerTechStack: data.footerTechStack ?? INITIAL_PROFILE.footerTechStack,
-        aboutLabel: data.aboutLabel ?? INITIAL_PROFILE.aboutLabel,
-        aboutHeading: data.aboutHeading ?? INITIAL_PROFILE.aboutHeading,
-        aboutIntroTitle: data.aboutIntroTitle ?? INITIAL_PROFILE.aboutIntroTitle,
-        aboutParagraphOne: data.aboutParagraphOne ?? INITIAL_PROFILE.aboutParagraphOne,
-        aboutParagraphTwo: data.aboutParagraphTwo ?? INITIAL_PROFILE.aboutParagraphTwo,
-        aboutResumeLabel: data.aboutResumeLabel ?? INITIAL_PROFILE.aboutResumeLabel,
-        aboutGithubLabel: data.aboutGithubLabel ?? INITIAL_PROFILE.aboutGithubLabel,
-        aboutContactLabel: data.aboutContactLabel ?? INITIAL_PROFILE.aboutContactLabel,
-        aboutPrincipleOneTitle: data.aboutPrincipleOneTitle ?? INITIAL_PROFILE.aboutPrincipleOneTitle,
-        aboutPrincipleOneDescription: data.aboutPrincipleOneDescription ?? INITIAL_PROFILE.aboutPrincipleOneDescription,
-        aboutPrincipleTwoTitle: data.aboutPrincipleTwoTitle ?? INITIAL_PROFILE.aboutPrincipleTwoTitle,
-        aboutPrincipleTwoDescription: data.aboutPrincipleTwoDescription ?? INITIAL_PROFILE.aboutPrincipleTwoDescription,
-        aboutPrincipleThreeTitle: data.aboutPrincipleThreeTitle ?? INITIAL_PROFILE.aboutPrincipleThreeTitle,
-        aboutPrincipleThreeDescription: data.aboutPrincipleThreeDescription ?? INITIAL_PROFILE.aboutPrincipleThreeDescription,
-        heroTechStack: data.heroTechStack ?? INITIAL_PROFILE.heroTechStack,
-        heroCodeLineOne: data.heroCodeLineOne ?? INITIAL_PROFILE.heroCodeLineOne,
-        heroCodeLineTwo: data.heroCodeLineTwo ?? INITIAL_PROFILE.heroCodeLineTwo,
-        heroCodeLineThree: data.heroCodeLineThree ?? INITIAL_PROFILE.heroCodeLineThree,
-        heroStatusLabel: data.heroStatusLabel ?? INITIAL_PROFILE.heroStatusLabel,
-        heroStatusText: data.heroStatusText ?? INITIAL_PROFILE.heroStatusText,
-        techStackCategoryOrder: data.techStackCategoryOrder ?? INITIAL_PROFILE.techStackCategoryOrder,
+        resumeUrl: data.resumeUrl ?? current.resumeUrl,
+        githubUrl: data.githubUrl ?? current.githubUrl,
+        linkedinUrl: data.linkedinUrl ?? current.linkedinUrl,
+        twitterUrl: data.twitterUrl ?? current.twitterUrl,
+        contactEmail: data.contactEmail ?? current.contactEmail,
+        footerBrand: data.footerBrand ?? current.footerBrand,
+        footerLabel: data.footerLabel ?? current.footerLabel,
+        footerCopyright: data.footerCopyright ?? current.footerCopyright,
+        footerTechStack: data.footerTechStack ?? current.footerTechStack,
+        aboutLabel: data.aboutLabel ?? current.aboutLabel,
+        aboutHeading: data.aboutHeading ?? current.aboutHeading,
+        aboutIntroTitle: data.aboutIntroTitle ?? current.aboutIntroTitle,
+        aboutParagraphOne: data.aboutParagraphOne ?? current.aboutParagraphOne,
+        aboutParagraphTwo: data.aboutParagraphTwo ?? current.aboutParagraphTwo,
+        aboutResumeLabel: data.aboutResumeLabel ?? current.aboutResumeLabel,
+        aboutGithubLabel: data.aboutGithubLabel ?? current.aboutGithubLabel,
+        aboutContactLabel: data.aboutContactLabel ?? current.aboutContactLabel,
+        aboutPrincipleOneTitle: data.aboutPrincipleOneTitle ?? current.aboutPrincipleOneTitle,
+        aboutPrincipleOneDescription: data.aboutPrincipleOneDescription ?? current.aboutPrincipleOneDescription,
+        aboutPrincipleTwoTitle: data.aboutPrincipleTwoTitle ?? current.aboutPrincipleTwoTitle,
+        aboutPrincipleTwoDescription: data.aboutPrincipleTwoDescription ?? current.aboutPrincipleTwoDescription,
+        aboutPrincipleThreeTitle: data.aboutPrincipleThreeTitle ?? current.aboutPrincipleThreeTitle,
+        aboutPrincipleThreeDescription: data.aboutPrincipleThreeDescription ?? current.aboutPrincipleThreeDescription,
+        heroTechStack: data.heroTechStack ?? current.heroTechStack,
+        heroCodeLineOne: data.heroCodeLineOne ?? current.heroCodeLineOne,
+        heroCodeLineTwo: data.heroCodeLineTwo ?? current.heroCodeLineTwo,
+        heroCodeLineThree: data.heroCodeLineThree ?? current.heroCodeLineThree,
+        heroStatusLabel: data.heroStatusLabel ?? current.heroStatusLabel,
+        heroStatusText: data.heroStatusText ?? current.heroStatusText,
+        techStackCategoryOrder: data.techStackCategoryOrder ?? current.techStackCategoryOrder,
       },
     });
     memoryProfile = { ...memoryProfile, ...updated };

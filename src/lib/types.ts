@@ -95,6 +95,42 @@ export interface ProfileData {
   techStackCategoryOrder: string;
 }
 
+export const EMPTY_PROFILE: ProfileData = {
+  id: 'default-profile',
+  name: '',
+  role: '',
+  location: '',
+  headline: '',
+  subheadline: '',
+  availableForWork: false,
+  contactEmail: '',
+  footerBrand: '',
+  footerLabel: '',
+  footerCopyright: '',
+  footerTechStack: '',
+  aboutLabel: '',
+  aboutHeading: '',
+  aboutIntroTitle: '',
+  aboutParagraphOne: '',
+  aboutParagraphTwo: '',
+  aboutResumeLabel: '',
+  aboutGithubLabel: '',
+  aboutContactLabel: '',
+  aboutPrincipleOneTitle: '',
+  aboutPrincipleOneDescription: '',
+  aboutPrincipleTwoTitle: '',
+  aboutPrincipleTwoDescription: '',
+  aboutPrincipleThreeTitle: '',
+  aboutPrincipleThreeDescription: '',
+  heroTechStack: '',
+  heroCodeLineOne: '',
+  heroCodeLineTwo: '',
+  heroCodeLineThree: '',
+  heroStatusLabel: '',
+  heroStatusText: '',
+  techStackCategoryOrder: '',
+};
+
 export interface ThemeSettingsData {
   id: string;
   accentColor: string;

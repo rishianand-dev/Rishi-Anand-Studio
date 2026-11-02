@@ -23,7 +23,7 @@ export default function AboutSection() {
       title: profile.aboutPrincipleThreeTitle,
       description: profile.aboutPrincipleThreeDescription,
     },
-  ];
+  ].filter((principle) => principle.title.trim() || principle.description.trim());
 
   // Group dynamic skills by category
   const categories = profile.techStackCategoryOrder

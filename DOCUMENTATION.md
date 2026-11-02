@@ -45,8 +45,6 @@ The public page is composed of the following sections:
 │   └── schema.prisma          Database models and PostgreSQL configuration
 ├── public/
 │   └── resume.pdf             Local fallback resume
-├── scripts/
-│   └── seed.mjs               Initial database seed script
 ├── src/
 │   ├── app/
 │   │   ├── api/               Route handlers for content, contact, and admin login
@@ -61,7 +59,6 @@ The public page is composed of the following sections:
 │       ├── db.ts              Prisma access and in-memory fallback logic
 │       ├── storage.ts          Neon Object Storage client and URL helpers
 │       ├── upload.ts           Browser upload helper
-│       ├── initial-data.ts     Content used before database data exists
 │       ├── store.ts             Zustand store
 │       └── types.ts             Shared TypeScript data contracts
 ├── .env.example               Environment variable template
@@ -97,10 +94,9 @@ Create or select a PostgreSQL database, then apply the Prisma schema:
 ```bash
 npx prisma generate
 npm run prisma:push
-npm run seed
 ```
 
-`prisma db push` synchronizes the database with `prisma/schema.prisma` without creating migration files. The seed script inserts the initial portfolio content. Run the seed only when you want to initialize or refresh the database according to the script's behavior.
+`prisma db push` synchronizes the database with `prisma/schema.prisma` without creating migration files. Initial content is available through the application's fallback data and can be created or edited through the admin dashboard.
 
 ### Run the application
 
@@ -144,13 +140,13 @@ Never commit `.env` or real credentials. Use strong, deployment-specific admin c
 
 1. `src/app/layout.tsx` loads SEO settings and generates Next.js metadata.
 2. The public route renders the portfolio sections from `src/app/page.tsx`.
-3. Initial data is available from `src/lib/initial-data.ts`.
+3. The application starts with empty content until records are added through the admin panel.
 4. Client components read live content from `usePortfolioStore` in `src/lib/store.ts`.
 5. `StoreHydrator` replaces initial client state with server-fetched content when the application loads data from the database.
 
 ### Persistence and fallback behavior
 
-`src/lib/db.ts` attempts to use Prisma first. If PostgreSQL is unavailable, reads and writes fall back to in-memory arrays initialized from `src/lib/initial-data.ts`.
+`src/lib/db.ts` attempts to use Prisma first. If PostgreSQL is unavailable, reads and writes fall back to empty in-memory values; no sample data is injected or persisted automatically.
 
 This fallback is useful for local previews and builds, but it is not durable:
 
@@ -266,7 +262,6 @@ After a successful mutation, the dashboard updates the Zustand store so the curr
 | `npm run lint` | Run the configured Next.js lint command |
 | `npm run prisma:generate` | Generate the Prisma client |
 | `npm run prisma:push` | Push the Prisma schema to PostgreSQL |
-| `npm run seed` | Run the initial data seed script |
 
 ## 11. Deployment checklist
 
@@ -274,18 +269,17 @@ After a successful mutation, the dashboard updates the Zustand store so the curr
 2. Set strong `ADMIN_USERNAME` and `ADMIN_PASSWORD` values.
 3. Configure the Neon `media` bucket and verify the S3 credentials can upload and read objects.
 4. Run `npx prisma generate` and `npx prisma db push` as part of deployment setup.
-5. Seed the database only when initial data is needed.
-6. Confirm `npm run build` completes successfully.
-7. Protect every admin mutation endpoint with server-side authentication.
-8. Replace placeholder profile, social, canonical, and SEO values.
-9. Verify resume, project images, contact submissions, and metadata on the deployed domain.
-10. Ensure `.env`, build output, and dependency directories are excluded from version control.
+5. Confirm `npm run build` completes successfully.
+6. Protect every admin mutation endpoint with server-side authentication.
+7. Replace placeholder profile, social, canonical, and SEO values.
+8. Verify resume, project images, contact submissions, and metadata on the deployed domain.
+9. Ensure `.env`, build output, and dependency directories are excluded from version control.
 
 ## 12. Troubleshooting
 
 ### The app shows initial sample content
 
-Check `DATABASE_URL`, confirm PostgreSQL is reachable, run `npx prisma db push`, and run `npm run seed` if the database is empty.
+Check `DATABASE_URL`, confirm PostgreSQL is reachable, and run `npx prisma db push` if the schema is not up to date.
 
 ### Changes disappear after restart
 
