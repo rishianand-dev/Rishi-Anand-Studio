@@ -62,6 +62,8 @@ export const getThemeSettings = unstable_cache(readThemeSettings, ['portfolio-th
   tags: [TAGS.theme],
 });
 
+export const getThemeSettingsUncached = readThemeSettings;
+
 export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Promise<ThemeSettingsData> {
   const accentColor = data.accentColor ?? memoryTheme.accentColor;
   if (!isHexColor(accentColor)) {
@@ -74,7 +76,11 @@ export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Pro
       create: { id: 'default-theme', accentColor },
     });
     memoryTheme = { id: updated.id, accentColor: updated.accentColor };
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Theme settings persistence failed:', error);
+      throw new Error('Theme settings could not be saved. Check the production database connection and schema.');
+    }
     memoryTheme = { ...memoryTheme, accentColor };
   }
   invalidateTheme();

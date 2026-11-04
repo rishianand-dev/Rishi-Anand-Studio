@@ -265,6 +265,7 @@ After a successful mutation, the dashboard updates the Zustand store so the curr
 | `npm run start` | Serve the production build |
 | `npm run lint` | Run the configured Next.js lint command |
 | `npm run prisma:generate` | Generate the Prisma client |
+| `npm run prisma:deploy` | Generate the Prisma client and synchronize the production database schema |
 | `npm run prisma:push` | Push the Prisma schema to PostgreSQL |
 
 ## 11. Deployment checklist
@@ -272,7 +273,7 @@ After a successful mutation, the dashboard updates the Zustand store so the curr
 1. Provision PostgreSQL and set a production `DATABASE_URL`.
 2. Set strong `ADMIN_USERNAME` and `ADMIN_PASSWORD` values.
 3. Configure the Neon `media` bucket and verify the S3 credentials can upload and read objects.
-4. Run `npx prisma generate` and `npx prisma db push` as part of deployment setup.
+4. Run `npm run prisma:deploy` against the production `DATABASE_URL` before deploying the application. This creates the `ThemeSettings` table required by the Appearance editor.
 5. Confirm `npm run build` completes successfully.
 6. Protect every admin mutation endpoint with server-side authentication.
 7. Replace placeholder profile, social, canonical, and SEO values.
@@ -288,6 +289,10 @@ Check `DATABASE_URL`, confirm PostgreSQL is reachable, and run `npx prisma db pu
 ### Changes disappear after restart
 
 The application was using the in-memory fallback because PostgreSQL was unavailable. Configure a working database connection for durable writes.
+
+### Appearance changes work locally but not after deployment
+
+Confirm the deployed environment has the production database URL, then run `npm run prisma:deploy` using that same `DATABASE_URL`. The Appearance editor requires the `ThemeSettings` table. In production, database errors are returned instead of being reported as a successful in-memory save.
 
 ### Uploads fail
 

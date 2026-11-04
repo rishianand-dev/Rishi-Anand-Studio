@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getThemeSettings, updateThemeSettings } from '@/lib/db';
+import { getThemeSettingsUncached, updateThemeSettings } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const response = NextResponse.json({ success: true, theme: await getThemeSettings() });
+    const response = NextResponse.json({ success: true, theme: await getThemeSettingsUncached() });
     response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch (error) {
