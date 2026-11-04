@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { revalidateTag, unstable_cache } from 'next/cache';
+import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
 import { Project, ExperienceItem, ContactSubmission, ProfileData, EducationItem, SkillItem, SeoSettingsData, ThemeSettingsData, EMPTY_PROFILE } from './types';
 
 declare global {
@@ -41,6 +41,11 @@ const TAGS = {
 
 const invalidate = (tag: string) => revalidateTag(tag);
 
+const invalidateTheme = () => {
+  invalidate(TAGS.theme);
+  revalidatePath('/', 'layout');
+};
+
 async function readThemeSettings(): Promise<ThemeSettingsData> {
   try {
     const theme = await prisma.themeSettings.findUnique({ where: { id: 'default-theme' } });
@@ -72,7 +77,7 @@ export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Pro
   } catch {
     memoryTheme = { ...memoryTheme, accentColor };
   }
-  invalidate(TAGS.theme);
+  invalidateTheme();
   return memoryTheme;
 }
 

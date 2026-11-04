@@ -128,7 +128,7 @@ export default function AdminPage() {
           fetch('/api/profile'),
           fetch('/api/projects'),
           fetch('/api/seo'),
-          fetch('/api/theme'),
+          fetch('/api/theme', { cache: 'no-store' }),
         ]);
 
         const data = await profileRes.json();
@@ -296,6 +296,7 @@ export default function AdminPage() {
       });
       const data = await parseApiResponse<{ success: true; theme: ThemeSettingsData }>(res);
       setThemeForm(data.theme);
+      setAccentColor(data.theme.accentColor);
       showToast('Accent color saved successfully');
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Could not save accent color');
