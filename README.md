@@ -35,6 +35,9 @@ Designed and implemented with **Next.js 14 (App Router)**, **TypeScript**, **Tai
   - S3-compatible server-side storage integration for project screenshots, resume PDFs, SEO images, and contact attachments.
 - **Zustand State Management:**
   - Single-source store (`src/lib/store.ts`) for projects, skills, education, experiences, profile, category filtering, and modal states.
+- **ISR with on-demand revalidation:**
+  - The public portfolio uses tagged Incremental Static Regeneration with a one-hour fallback window.
+  - Successful admin content changes immediately invalidate the matching cache tag, so the next public request renders the updated content.
 
 ---
 

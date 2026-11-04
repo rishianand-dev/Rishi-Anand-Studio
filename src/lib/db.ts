@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { revalidateTag, unstable_cache } from 'next/cache';
 import { Project, ExperienceItem, ContactSubmission, ProfileData, EducationItem, SkillItem, SeoSettingsData, ThemeSettingsData, EMPTY_PROFILE } from './types';
 
 declare global {
@@ -28,7 +29,19 @@ let memoryTheme: ThemeSettingsData = { id: 'default-theme', accentColor: '#4f46e
 
 const isHexColor = (value: string): boolean => /^#[0-9a-f]{6}$/i.test(value);
 
-export async function getThemeSettings(): Promise<ThemeSettingsData> {
+const TAGS = {
+  theme: 'portfolio-theme',
+  seo: 'portfolio-seo',
+  profile: 'portfolio-profile',
+  projects: 'portfolio-projects',
+  education: 'portfolio-education',
+  skills: 'portfolio-skills',
+  experience: 'portfolio-experience',
+} as const;
+
+const invalidate = (tag: string) => revalidateTag(tag);
+
+async function readThemeSettings(): Promise<ThemeSettingsData> {
   try {
     const theme = await prisma.themeSettings.findUnique({ where: { id: 'default-theme' } });
     if (theme && isHexColor(theme.accentColor)) {
@@ -39,6 +52,10 @@ export async function getThemeSettings(): Promise<ThemeSettingsData> {
     return memoryTheme;
   }
 }
+
+export const getThemeSettings = unstable_cache(readThemeSettings, ['portfolio-theme-settings'], {
+  tags: [TAGS.theme],
+});
 
 export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Promise<ThemeSettingsData> {
   const accentColor = data.accentColor ?? memoryTheme.accentColor;
@@ -55,11 +72,12 @@ export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Pro
   } catch {
     memoryTheme = { ...memoryTheme, accentColor };
   }
+  invalidate(TAGS.theme);
   return memoryTheme;
 }
 
 // ---------------- SEO SETTINGS ----------------
-export async function getSeoSettings(): Promise<SeoSettingsData> {
+async function readSeoSettings(): Promise<SeoSettingsData> {
   try {
     const seo = await prisma.seoSettings.findFirst();
     if (seo) {
@@ -79,6 +97,10 @@ export async function getSeoSettings(): Promise<SeoSettingsData> {
     return memorySeo;
   }
 }
+
+export const getSeoSettings = unstable_cache(readSeoSettings, ['portfolio-seo-settings'], {
+  tags: [TAGS.seo],
+});
 
 export async function updateSeoSettings(data: Partial<SeoSettingsData>): Promise<SeoSettingsData> {
   try {
@@ -106,15 +128,17 @@ export async function updateSeoSettings(data: Partial<SeoSettingsData>): Promise
       },
     });
     memorySeo = { ...memorySeo, ...updated };
+    invalidate(TAGS.seo);
     return memorySeo;
   } catch (error) {
     memorySeo = { ...memorySeo, ...data };
+    invalidate(TAGS.seo);
     return memorySeo;
   }
 }
 
 // ---------------- PROFILE & HEADINGS ----------------
-export async function getProfile(): Promise<ProfileData> {
+async function readProfile(): Promise<ProfileData> {
   try {
     const profile = await prisma.profile.findFirst();
     if (profile) {
@@ -164,6 +188,10 @@ export async function getProfile(): Promise<ProfileData> {
     return memoryProfile;
   }
 }
+
+export const getProfile = unstable_cache(readProfile, ['portfolio-profile'], {
+  tags: [TAGS.profile],
+});
 
 export async function updateProfile(data: Partial<ProfileData>): Promise<ProfileData> {
   try {
@@ -250,15 +278,17 @@ export async function updateProfile(data: Partial<ProfileData>): Promise<Profile
       },
     });
     memoryProfile = { ...memoryProfile, ...updated };
+    invalidate(TAGS.profile);
     return memoryProfile;
   } catch (error) {
     memoryProfile = { ...memoryProfile, ...data };
+    invalidate(TAGS.profile);
     return memoryProfile;
   }
 }
 
 // ---------------- PROJECTS ----------------
-export async function getProjects(): Promise<Project[]> {
+async function readProjects(): Promise<Project[]> {
   try {
     const projects = await prisma.project.findMany({
       orderBy: { order: 'asc' },
@@ -274,6 +304,10 @@ export async function getProjects(): Promise<Project[]> {
     return memoryProjects;
   }
 }
+
+export const getProjects = unstable_cache(readProjects, ['portfolio-projects'], {
+  tags: [TAGS.projects],
+});
 
 export async function createProject(data: Omit<Project, 'id' | 'createdAt'>): Promise<Project> {
   try {
@@ -296,6 +330,7 @@ export async function createProject(data: Omit<Project, 'id' | 'createdAt'>): Pr
     });
     const proj = { ...created, category: created.category as Project['category'] };
     memoryProjects = [proj, ...memoryProjects];
+    invalidate(TAGS.projects);
     return proj;
   } catch (error) {
     const newProj: Project = {
@@ -304,6 +339,7 @@ export async function createProject(data: Omit<Project, 'id' | 'createdAt'>): Pr
       createdAt: new Date().toISOString(),
     };
     memoryProjects = [newProj, ...memoryProjects];
+    invalidate(TAGS.projects);
     return newProj;
   }
 }
@@ -330,11 +366,13 @@ export async function updateProject(id: string, data: Partial<Project>): Promise
     });
     const result = { ...updated, category: updated.category as Project['category'] };
     memoryProjects = memoryProjects.map((p) => (p.id === id ? result : p));
+    invalidate(TAGS.projects);
     return result;
   } catch (error) {
     memoryProjects = memoryProjects.map((p) => (p.id === id ? { ...p, ...data } : p));
     const found = memoryProjects.find((p) => p.id === id);
     if (!found) throw new Error('Project not found');
+    invalidate(TAGS.projects);
     return found;
   }
 }
@@ -346,11 +384,12 @@ export async function deleteProject(id: string): Promise<boolean> {
     // fallback
   }
   memoryProjects = memoryProjects.filter((p) => p.id !== id);
+  invalidate(TAGS.projects);
   return true;
 }
 
 // ---------------- EDUCATION ----------------
-export async function getEducations(): Promise<EducationItem[]> {
+async function readEducations(): Promise<EducationItem[]> {
   try {
     const items = await prisma.education.findMany({ orderBy: { order: 'asc' } });
     if (items && items.length > 0) return items;
@@ -359,6 +398,10 @@ export async function getEducations(): Promise<EducationItem[]> {
     return memoryEducation;
   }
 }
+
+export const getEducations = unstable_cache(readEducations, ['portfolio-education'], {
+  tags: [TAGS.education],
+});
 
 export async function createEducation(data: Omit<EducationItem, 'id'>): Promise<EducationItem> {
   try {
@@ -373,10 +416,12 @@ export async function createEducation(data: Omit<EducationItem, 'id'>): Promise<
       },
     });
     memoryEducation = [...memoryEducation, created];
+    invalidate(TAGS.education);
     return created;
   } catch (error) {
     const item: EducationItem = { ...data, id: `edu-${Date.now()}` };
     memoryEducation = [...memoryEducation, item];
+    invalidate(TAGS.education);
     return item;
   }
 }
@@ -395,11 +440,13 @@ export async function updateEducation(id: string, data: Partial<EducationItem>):
       },
     });
     memoryEducation = memoryEducation.map((e) => (e.id === id ? updated : e));
+    invalidate(TAGS.education);
     return updated;
   } catch (error) {
     memoryEducation = memoryEducation.map((e) => (e.id === id ? { ...e, ...data } : e));
     const found = memoryEducation.find((e) => e.id === id);
     if (!found) throw new Error('Education item not found');
+    invalidate(TAGS.education);
     return found;
   }
 }
@@ -411,11 +458,12 @@ export async function deleteEducation(id: string): Promise<boolean> {
     // fallback
   }
   memoryEducation = memoryEducation.filter((e) => e.id !== id);
+  invalidate(TAGS.education);
   return true;
 }
 
 // ---------------- SKILLS / TECH STACK ----------------
-export async function getSkills(): Promise<SkillItem[]> {
+async function readSkills(): Promise<SkillItem[]> {
   try {
     const items = await prisma.skill.findMany({ orderBy: { order: 'asc' } });
     if (items && items.length > 0) return items;
@@ -424,6 +472,10 @@ export async function getSkills(): Promise<SkillItem[]> {
     return memorySkills;
   }
 }
+
+export const getSkills = unstable_cache(readSkills, ['portfolio-skills'], {
+  tags: [TAGS.skills],
+});
 
 export async function createSkill(data: Omit<SkillItem, 'id'>): Promise<SkillItem> {
   try {
@@ -435,10 +487,12 @@ export async function createSkill(data: Omit<SkillItem, 'id'>): Promise<SkillIte
       },
     });
     memorySkills = [...memorySkills, created];
+    invalidate(TAGS.skills);
     return created;
   } catch (error) {
     const item: SkillItem = { ...data, id: `sk-${Date.now()}` };
     memorySkills = [...memorySkills, item];
+    invalidate(TAGS.skills);
     return item;
   }
 }
@@ -454,11 +508,13 @@ export async function updateSkill(id: string, data: Partial<SkillItem>): Promise
       },
     });
     memorySkills = memorySkills.map((s) => (s.id === id ? updated : s));
+    invalidate(TAGS.skills);
     return updated;
   } catch (error) {
     memorySkills = memorySkills.map((s) => (s.id === id ? { ...s, ...data } : s));
     const found = memorySkills.find((s) => s.id === id);
     if (!found) throw new Error('Skill not found');
+    invalidate(TAGS.skills);
     return found;
   }
 }
@@ -470,11 +526,12 @@ export async function deleteSkill(id: string): Promise<boolean> {
     // fallback
   }
   memorySkills = memorySkills.filter((s) => s.id !== id);
+  invalidate(TAGS.skills);
   return true;
 }
 
 // ---------------- EXPERIENCE ----------------
-export async function getExperiences(): Promise<ExperienceItem[]> {
+async function readExperiences(): Promise<ExperienceItem[]> {
   try {
     const exps = await prisma.experience.findMany({
       orderBy: { order: 'asc' },
@@ -485,6 +542,10 @@ export async function getExperiences(): Promise<ExperienceItem[]> {
     return memoryExperience;
   }
 }
+
+export const getExperiences = unstable_cache(readExperiences, ['portfolio-experience'], {
+  tags: [TAGS.experience],
+});
 
 export async function createExperience(data: Omit<ExperienceItem, 'id'>): Promise<ExperienceItem> {
   try {
@@ -500,10 +561,12 @@ export async function createExperience(data: Omit<ExperienceItem, 'id'>): Promis
       },
     });
     memoryExperience = [...memoryExperience, created];
+    invalidate(TAGS.experience);
     return created;
   } catch (error) {
     const item: ExperienceItem = { ...data, id: `exp-${Date.now()}` };
     memoryExperience = [...memoryExperience, item];
+    invalidate(TAGS.experience);
     return item;
   }
 }
@@ -523,11 +586,13 @@ export async function updateExperience(id: string, data: Partial<ExperienceItem>
       },
     });
     memoryExperience = memoryExperience.map((e) => (e.id === id ? updated : e));
+    invalidate(TAGS.experience);
     return updated;
   } catch (error) {
     memoryExperience = memoryExperience.map((e) => (e.id === id ? { ...e, ...data } : e));
     const found = memoryExperience.find((e) => e.id === id);
     if (!found) throw new Error('Experience not found');
+    invalidate(TAGS.experience);
     return found;
   }
 }
@@ -539,6 +604,7 @@ export async function deleteExperience(id: string): Promise<boolean> {
     // fallback
   }
   memoryExperience = memoryExperience.filter((e) => e.id !== id);
+  invalidate(TAGS.experience);
   return true;
 }
 

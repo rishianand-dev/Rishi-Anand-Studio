@@ -6,7 +6,7 @@ import ContactSection from '@/components/ui/ContactSection';
 import StoreHydrator from '@/components/StoreHydrator';
 import { getEducations, getExperiences, getProfile, getProjects, getSkills } from '@/lib/db';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function Home() {
   const [projects, experiences, educations, skills, profile] = await Promise.all([

@@ -22,6 +22,10 @@ The public page is composed of the following sections:
 5. **Contact** - contact form backed by the `ContactMessage` model
 6. **Footer** - social links and back-to-top control
 
+### Rendering and cache invalidation
+
+The public page uses Next.js Incremental Static Regeneration (ISR) with a one-hour fallback revalidation period. Database reads in `src/lib/db.ts` use tagged `unstable_cache` entries for profile, projects, experience, education, skills, SEO, and theme data. Admin mutations call `revalidateTag` for the affected data after a successful update, so the next request receives fresh content without rebuilding the application. Interactive controls still run on the client through React and Zustand.
+
 ## 2. Technology stack
 
 | Area | Technology |
