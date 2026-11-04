@@ -177,6 +177,37 @@ body {
 .hover\:from-indigo-500:hover { --tw-gradient-from: var(--accent-500) var(--tw-gradient-from-position); }
 .hover\:to-indigo-600:hover { --tw-gradient-to: var(--accent-600) var(--tw-gradient-to-position); }
 
+#work,
+#about,
+#experience,
+#contact {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+
+@media (max-width: 767px) {
+  .ambient-orb {
+    animation: none !important;
+    filter: none !important;
+    opacity: 0.12 !important;
+  }
+
+  .ambient-background > .absolute:last-child {
+    display: none;
+  }
+
+  .liquid-glass-nav,
+  .liquid-glass-card,
+  .liquid-badge {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .liquid-glass-card {
+    box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.16);
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
