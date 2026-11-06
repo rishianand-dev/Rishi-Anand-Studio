@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Lock,
   LogOut,
@@ -29,11 +29,19 @@ import {
   Globe,
   Share2,
   Palette,
-} from 'lucide-react';
-import { usePortfolioStore } from '@/lib/store';
-import { Project, ExperienceItem, EducationItem, SkillItem, ProfileData, SeoSettingsData, ThemeSettingsData } from '@/lib/types';
-import { uploadPortfolioFile } from '@/lib/upload';
-import confetti from 'canvas-confetti';
+} from "lucide-react";
+import { usePortfolioStore } from "@/lib/store";
+import {
+  Project,
+  ExperienceItem,
+  EducationItem,
+  SkillItem,
+  ProfileData,
+  SeoSettingsData,
+  ThemeSettingsData,
+} from "@/lib/types";
+import { uploadPortfolioFile } from "@/lib/upload";
+import confetti from "canvas-confetti";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -64,12 +72,14 @@ export default function AdminPage() {
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [loginLoading, setLoginLoading] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [loginError, setLoginError] = useState("");
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'heading' | 'about' | 'footer' | 'projects' | 'tech' | 'experience' | 'education' | 'seo' | 'appearance'>('heading');
+  const [activeTab, setActiveTab] = useState<
+    "heading" | "about" | "footer" | "projects" | "tech" | "experience" | "education" | "seo" | "appearance"
+  >("heading");
 
   // Notification Toast
   const [toast, setToast] = useState<string | null>(null);
@@ -89,20 +99,20 @@ export default function AdminPage() {
 
   // SEO Form state
   const [seoForm, setSeoForm] = useState<SeoSettingsData>({
-    id: 'default-seo',
-    metaTitle: '',
-    metaDescription: '',
-    keywords: '',
-    robots: '',
+    id: "default-seo",
+    metaTitle: "",
+    metaDescription: "",
+    keywords: "",
+    robots: "",
   });
   const [ogImageFile, setOgImageFile] = useState<File | null>(null);
   const [ogUploading, setOgUploading] = useState(false);
   const [ogProgress, setOgProgress] = useState<number | null>(null);
   const [seoSaving, setSeoSaving] = useState(false);
-  const [themeForm, setThemeForm] = useState<ThemeSettingsData>({ id: 'default-theme', accentColor: '#4f46e5' });
+  const [themeForm, setThemeForm] = useState<ThemeSettingsData>({ id: "default-theme", accentColor: "#4f46e5" });
   const [themeSaving, setThemeSaving] = useState(false);
   const techCategories = profileForm.techStackCategoryOrder
-    .split(',')
+    .split(",")
     .map((category) => category.trim())
     .filter(Boolean);
 
@@ -110,7 +120,7 @@ export default function AdminPage() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch('/api/admin/check');
+        const res = await fetch("/api/admin/check");
         const data = await res.json();
         setIsAuthenticated(data.authenticated === true);
       } catch (e) {
@@ -125,10 +135,10 @@ export default function AdminPage() {
     async function fetchData() {
       try {
         const [profileRes, projectsRes, seoRes, themeRes] = await Promise.all([
-          fetch('/api/profile'),
-          fetch('/api/projects'),
-          fetch('/api/seo'),
-          fetch('/api/theme', { cache: 'no-store' }),
+          fetch("/api/profile"),
+          fetch("/api/projects"),
+          fetch("/api/seo"),
+          fetch("/api/theme", { cache: "no-store" }),
         ]);
 
         const data = await profileRes.json();
@@ -190,7 +200,7 @@ export default function AdminPage() {
     direction: -1 | 1,
     endpoint: string,
     setItems: (items: T[]) => void,
-    label: string
+    label: string,
   ) => {
     const targetIndex = index + direction;
     if (targetIndex < 0 || targetIndex >= items.length) return;
@@ -206,11 +216,11 @@ export default function AdminPage() {
       const responses = await Promise.all(
         normalized.map((item) =>
           fetch(`${endpoint}/${item.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ order: item.order }),
-          })
-        )
+          }),
+        ),
       );
 
       if (responses.some((response) => !response.ok)) {
@@ -234,29 +244,29 @@ export default function AdminPage() {
     try {
       const responses = await Promise.all([
         fetch(`/api/skills/${current.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order: target.order }),
         }),
         fetch(`/api/skills/${target.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order: current.order }),
         }),
       ]);
 
       if (responses.some((response) => !response.ok)) {
-        throw new Error('Failed to update skill order');
+        throw new Error("Failed to update skill order");
       }
 
       const reordered = [...categorySkills];
       [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
       const reorderedById = new Map(reordered.map((skill) => [skill.id, skill]));
       setSkills(skills.map((skill) => reorderedById.get(skill.id) || skill));
-      showToast('Tech stack order updated');
+      showToast("Tech stack order updated");
     } catch (error) {
-      console.error('Error reordering skills:', error);
-      showToast('Could not update tech stack order');
+      console.error("Error reordering skills:", error);
+      showToast("Could not update tech stack order");
     }
   };
 
@@ -265,23 +275,23 @@ export default function AdminPage() {
     if (targetIndex < 0 || targetIndex >= techCategories.length) return;
     const reordered = [...techCategories];
     [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
-    setProfileForm({ ...profileForm, techStackCategoryOrder: reordered.join(',') });
+    setProfileForm({ ...profileForm, techStackCategoryOrder: reordered.join(",") });
   };
 
   const saveTechCategoryOrder = async () => {
     try {
-      const res = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profileForm),
       });
       const data = await parseApiResponse<{ success: true; profile: ProfileData }>(res);
       setProfile(data.profile);
       setProfileForm(data.profile);
-      showToast('Tech stack category order updated');
+      showToast("Tech stack category order updated");
     } catch (error) {
-      console.error('Error saving tech stack category order:', error);
-      showToast(error instanceof Error ? error.message : 'Could not save category order');
+      console.error("Error saving tech stack category order:", error);
+      showToast(error instanceof Error ? error.message : "Could not save category order");
     }
   };
 
@@ -289,17 +299,17 @@ export default function AdminPage() {
     e.preventDefault();
     setThemeSaving(true);
     try {
-      const res = await fetch('/api/theme', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/theme", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(themeForm),
       });
       const data = await parseApiResponse<{ success: true; theme: ThemeSettingsData }>(res);
       setThemeForm(data.theme);
       setAccentColor(data.theme.accentColor);
-      showToast('Accent color saved. Rebuild to publish it.');
+      showToast("Accent color saved. Rebuild to publish it.");
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Could not save accent color');
+      showToast(error instanceof Error ? error.message : "Could not save accent color");
     } finally {
       setThemeSaving(false);
     }
@@ -308,29 +318,29 @@ export default function AdminPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
-    setLoginError('');
+    setLoginError("");
 
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginForm),
       });
       const data = await res.json();
       if (!data.success) {
-        throw new Error(data.error || 'Invalid credentials');
+        throw new Error(data.error || "Invalid credentials");
       }
       setIsAuthenticated(true);
       confetti({ particleCount: 50, spread: 45, origin: { y: 0.6 } });
     } catch (err: any) {
-      setLoginError(err.message || 'Login failed');
+      setLoginError(err.message || "Login failed");
     } finally {
       setLoginLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' });
+    await fetch("/api/admin/logout", { method: "POST" });
     setIsAuthenticated(false);
   };
 
@@ -341,22 +351,22 @@ export default function AdminPage() {
       let finalResumeUrl = profileForm.resumeUrl;
       if (resumeFile) {
         setResumeUploading(true);
-        finalResumeUrl = await uploadPortfolioFile(resumeFile, 'resumes', (p) => setResumeProgress(p));
+        finalResumeUrl = await uploadPortfolioFile(resumeFile, "resumes", (p) => setResumeProgress(p));
         setResumeUploading(false);
       }
 
       const updatedData = { ...profileForm, resumeUrl: finalResumeUrl };
-      const res = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
       const data = await parseApiResponse<{ success: true; profile: ProfileData }>(res);
       setProfile(data.profile);
       setProfileForm(data.profile);
-      showToast('Heading & Profile updated successfully in Postgres!');
+      showToast("Heading & Profile updated successfully in Postgres!");
     } catch (err: any) {
-      alert('Error updating profile: ' + err.message);
+      alert("Error updating profile: " + err.message);
     }
   };
 
@@ -368,22 +378,22 @@ export default function AdminPage() {
       let finalOgUrl = seoForm.ogImageUrl;
       if (ogImageFile) {
         setOgUploading(true);
-        finalOgUrl = await uploadPortfolioFile(ogImageFile, 'seo-images', (p) => setOgProgress(p));
+        finalOgUrl = await uploadPortfolioFile(ogImageFile, "seo-images", (p) => setOgProgress(p));
         setOgUploading(false);
       }
 
       const updatedSeo = { ...seoForm, ogImageUrl: finalOgUrl };
-      const res = await fetch('/api/seo', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/seo", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedSeo),
       });
       const data = await parseApiResponse<{ success: true; seo: SeoSettingsData }>(res);
       setSeoForm(data.seo);
-      showToast('SEO & Social metadata saved to PostgreSQL!');
+      showToast("SEO & Social metadata saved to PostgreSQL!");
       confetti({ particleCount: 40, spread: 40, origin: { y: 0.6 } });
     } catch (err: any) {
-      alert('Error saving SEO settings: ' + err.message);
+      alert("Error saving SEO settings: " + err.message);
     } finally {
       setSeoSaving(false);
     }
@@ -408,9 +418,7 @@ export default function AdminPage() {
               <Lock className="w-6 h-6" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Admin Authentication</h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Sign in to manage portfolio content, tech stack & SEO
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Sign in to manage portfolio content, tech stack & SEO</p>
           </div>
 
           {loginError && (
@@ -422,9 +430,7 @@ export default function AdminPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">
-                Username
-              </label>
+              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">Username</label>
               <input
                 type="text"
                 required
@@ -436,9 +442,7 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">
-                Password
-              </label>
+              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">Password</label>
               <input
                 type="password"
                 required
@@ -531,9 +535,9 @@ export default function AdminPage() {
       {/* Navigation Tabs */}
       <div className="flex flex-wrap items-center gap-2 mb-8 p-1.5 rounded-2xl liquid-glass-nav w-fit">
         <button
-          onClick={() => setActiveTab('heading')}
+          onClick={() => setActiveTab("heading")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'heading' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "heading" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Sparkles className="w-4 h-4" />
@@ -541,9 +545,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('about')}
+          onClick={() => setActiveTab("about")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'about' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "about" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Sparkles className="w-4 h-4" />
@@ -551,9 +555,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('footer')}
+          onClick={() => setActiveTab("footer")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'footer' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "footer" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -561,9 +565,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('projects')}
+          onClick={() => setActiveTab("projects")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'projects' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "projects" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -571,9 +575,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('tech')}
+          onClick={() => setActiveTab("tech")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'tech' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "tech" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Code2 className="w-4 h-4" />
@@ -581,9 +585,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('experience')}
+          onClick={() => setActiveTab("experience")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'experience' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "experience" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Briefcase className="w-4 h-4" />
@@ -591,9 +595,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('education')}
+          onClick={() => setActiveTab("education")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'education' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "education" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <GraduationCap className="w-4 h-4" />
@@ -602,9 +606,9 @@ export default function AdminPage() {
 
         {/* SEO TAB */}
         <button
-          onClick={() => setActiveTab('seo')}
+          onClick={() => setActiveTab("seo")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'seo' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "seo" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Search className="w-4 h-4" />
@@ -612,9 +616,9 @@ export default function AdminPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('appearance')}
+          onClick={() => setActiveTab("appearance")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'appearance' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white/60'
+            activeTab === "appearance" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:bg-white/60"
           }`}
         >
           <Palette className="w-4 h-4" />
@@ -623,7 +627,7 @@ export default function AdminPage() {
       </div>
 
       {/* TAB CONTENT 1: HEADING & PROFILE */}
-      {activeTab === 'heading' && (
+      {activeTab === "heading" && (
         <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
           <div className="flex items-center justify-between pb-4 border-b border-slate-200/60 mb-6">
             <div>
@@ -635,9 +639,7 @@ export default function AdminPage() {
           <form onSubmit={handleProfileSave} className="space-y-6 max-w-3xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  Display Name
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Display Name</label>
                 <input
                   type="text"
                   value={profileForm.name}
@@ -660,9 +662,7 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                Main Hero Headline
-              </label>
+              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Main Hero Headline</label>
               <textarea
                 rows={2}
                 value={profileForm.headline}
@@ -691,9 +691,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  Technology Strip
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Technology Strip</label>
                 <input
                   type="text"
                   value={profileForm.heroTechStack}
@@ -741,9 +739,7 @@ export default function AdminPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  Location
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Location</label>
                 <input
                   type="text"
                   value={profileForm.location}
@@ -772,11 +768,11 @@ export default function AdminPage() {
                 <span>Resume Document / URL (Neon Object Storage)</span>
                 <span className="text-[10px] text-indigo-600 font-normal">Neon Bucket: media</span>
               </label>
-              
+
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-2">
                 <input
                   type="text"
-                  value={profileForm.resumeUrl || ''}
+                  value={profileForm.resumeUrl || ""}
                   onChange={(e) => setProfileForm({ ...profileForm, resumeUrl: e.target.value })}
                   placeholder="https://... or /resume.pdf"
                   className="flex-1 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:ring-2 focus:ring-indigo-500/40 outline-none"
@@ -784,7 +780,7 @@ export default function AdminPage() {
 
                 <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition-colors shadow-2xs">
                   <Upload className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>{resumeFile ? resumeFile.name : 'Upload New PDF'}</span>
+                  <span>{resumeFile ? resumeFile.name : "Upload New PDF"}</span>
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -805,36 +801,30 @@ export default function AdminPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  GitHub URL
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">GitHub URL</label>
                 <input
                   type="url"
-                  value={profileForm.githubUrl || ''}
+                  value={profileForm.githubUrl || ""}
                   onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
                   className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  LinkedIn URL
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">LinkedIn URL</label>
                 <input
                   type="url"
-                  value={profileForm.linkedinUrl || ''}
+                  value={profileForm.linkedinUrl || ""}
                   onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
                   className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  Twitter / X URL
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Twitter / X URL</label>
                 <input
                   type="url"
-                  value={profileForm.twitterUrl || ''}
+                  value={profileForm.twitterUrl || ""}
                   onChange={(e) => setProfileForm({ ...profileForm, twitterUrl: e.target.value })}
                   className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs"
                 />
@@ -870,13 +860,13 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 2: ABOUT */}
-      {activeTab === 'about' && (
+      {activeTab === "about" && (
         <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
           <div className="pb-4 border-b border-slate-200/60 mb-6">
             <h2 className="text-lg font-bold text-slate-900">About Section Controls</h2>
             <p className="text-xs text-slate-500">
-              Control every text element in the left bio card and each right-side philosophy card.
-              Use <code className="text-indigo-600">{'{name}'}</code> in the intro title to insert the profile name.
+              Control every text element in the left bio card and each right-side philosophy card. Use{" "}
+              <code className="text-indigo-600">{"{name}"}</code> in the intro title to insert the profile name.
             </p>
           </div>
 
@@ -886,11 +876,19 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Eyebrow Label</label>
-                  <input value={profileForm.aboutLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutLabel: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                  <input
+                    value={profileForm.aboutLabel}
+                    onChange={(e) => setProfileForm({ ...profileForm, aboutLabel: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Main Heading</label>
-                  <input value={profileForm.aboutHeading} onChange={(e) => setProfileForm({ ...profileForm, aboutHeading: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                  <input
+                    value={profileForm.aboutHeading}
+                    onChange={(e) => setProfileForm({ ...profileForm, aboutHeading: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                  />
                 </div>
               </div>
             </section>
@@ -899,34 +897,84 @@ export default function AdminPage() {
               <h3 className="text-sm font-bold text-slate-900">Left bio card</h3>
               <div>
                 <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Intro Title</label>
-                <input value={profileForm.aboutIntroTitle} onChange={(e) => setProfileForm({ ...profileForm, aboutIntroTitle: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                <input
+                  value={profileForm.aboutIntroTitle}
+                  onChange={(e) => setProfileForm({ ...profileForm, aboutIntroTitle: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <textarea rows={5} value={profileForm.aboutParagraphOne} onChange={(e) => setProfileForm({ ...profileForm, aboutParagraphOne: e.target.value })} placeholder="First paragraph" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none" />
-                <textarea rows={5} value={profileForm.aboutParagraphTwo} onChange={(e) => setProfileForm({ ...profileForm, aboutParagraphTwo: e.target.value })} placeholder="Second paragraph" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none" />
+                <textarea
+                  rows={5}
+                  value={profileForm.aboutParagraphOne}
+                  onChange={(e) => setProfileForm({ ...profileForm, aboutParagraphOne: e.target.value })}
+                  placeholder="First paragraph"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none"
+                />
+                <textarea
+                  rows={5}
+                  value={profileForm.aboutParagraphTwo}
+                  onChange={(e) => setProfileForm({ ...profileForm, aboutParagraphTwo: e.target.value })}
+                  placeholder="Second paragraph"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none"
+                />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input value={profileForm.aboutResumeLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutResumeLabel: e.target.value })} placeholder="Resume button label" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
-                <input value={profileForm.aboutGithubLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutGithubLabel: e.target.value })} placeholder="GitHub button label" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
-                <input value={profileForm.aboutContactLabel} onChange={(e) => setProfileForm({ ...profileForm, aboutContactLabel: e.target.value })} placeholder="Contact button label" className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
+                <input
+                  value={profileForm.aboutResumeLabel}
+                  onChange={(e) => setProfileForm({ ...profileForm, aboutResumeLabel: e.target.value })}
+                  placeholder="Resume button label"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+                <input
+                  value={profileForm.aboutGithubLabel}
+                  onChange={(e) => setProfileForm({ ...profileForm, aboutGithubLabel: e.target.value })}
+                  placeholder="GitHub button label"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
+                <input
+                  value={profileForm.aboutContactLabel}
+                  onChange={(e) => setProfileForm({ ...profileForm, aboutContactLabel: e.target.value })}
+                  placeholder="Contact button label"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                />
               </div>
             </section>
 
             <section className="space-y-4">
               <h3 className="text-sm font-bold text-slate-900">Right philosophy cards</h3>
-              {([
-                ['One', 'aboutPrincipleOneTitle', 'aboutPrincipleOneDescription'],
-                ['Two', 'aboutPrincipleTwoTitle', 'aboutPrincipleTwoDescription'],
-                ['Three', 'aboutPrincipleThreeTitle', 'aboutPrincipleThreeDescription'],
-              ] as const).map(([label, titleKey, descriptionKey]) => (
-                <div key={label} className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                  <input value={profileForm[titleKey]} onChange={(e) => setProfileForm({ ...profileForm, [titleKey]: e.target.value })} placeholder={`Card ${label} title`} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none" />
-                  <textarea rows={2} value={profileForm[descriptionKey]} onChange={(e) => setProfileForm({ ...profileForm, [descriptionKey]: e.target.value })} placeholder={`Card ${label} description`} className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none" />
+              {(
+                [
+                  ["One", "aboutPrincipleOneTitle", "aboutPrincipleOneDescription"],
+                  ["Two", "aboutPrincipleTwoTitle", "aboutPrincipleTwoDescription"],
+                  ["Three", "aboutPrincipleThreeTitle", "aboutPrincipleThreeDescription"],
+                ] as const
+              ).map(([label, titleKey, descriptionKey]) => (
+                <div
+                  key={label}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200"
+                >
+                  <input
+                    value={profileForm[titleKey]}
+                    onChange={(e) => setProfileForm({ ...profileForm, [titleKey]: e.target.value })}
+                    placeholder={`Card ${label} title`}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none"
+                  />
+                  <textarea
+                    rows={2}
+                    value={profileForm[descriptionKey]}
+                    onChange={(e) => setProfileForm({ ...profileForm, [descriptionKey]: e.target.value })}
+                    placeholder={`Card ${label} description`}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm outline-none resize-none"
+                  />
                 </div>
               ))}
             </section>
 
-            <button type="submit" className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center gap-2 cursor-pointer">
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center gap-2 cursor-pointer"
+            >
               <Save className="w-4 h-4" />
               <span>Save About Settings</span>
             </button>
@@ -935,7 +983,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 3: FOOTER */}
-      {activeTab === 'footer' && (
+      {activeTab === "footer" && (
         <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
           <div className="pb-4 border-b border-slate-200/60 mb-6">
             <h2 className="text-lg font-bold text-slate-900">Footer Controls</h2>
@@ -947,9 +995,7 @@ export default function AdminPage() {
           <form onSubmit={handleProfileSave} className="space-y-6 max-w-3xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  Footer Brand
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Footer Brand</label>
                 <input
                   type="text"
                   value={profileForm.footerBrand}
@@ -959,9 +1005,7 @@ export default function AdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                  Footer Label
-                </label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Footer Label</label>
                 <input
                   type="text"
                   value={profileForm.footerLabel}
@@ -973,9 +1017,7 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                Copyright Text
-              </label>
+              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Copyright Text</label>
               <input
                 type="text"
                 value={profileForm.footerCopyright}
@@ -986,9 +1028,7 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">
-                Technology Line
-              </label>
+              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1.5">Technology Line</label>
               <input
                 type="text"
                 value={profileForm.footerTechStack}
@@ -1010,7 +1050,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 3: PROJECTS */}
-      {activeTab === 'projects' && (
+      {activeTab === "projects" && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -1021,18 +1061,19 @@ export default function AdminPage() {
               onClick={() => {
                 const newP: Project = {
                   id: `proj-${Date.now()}`,
-                  title: 'New Innovation Platform',
+                  title: "New Innovation Platform",
                   slug: `project-${Date.now()}`,
-                  description: 'Description of the new system...',
-                  longDescription: 'Extended technical overview...',
-                  category: 'Full Stack',
-                  tags: ['Next.js', 'PostgreSQL', 'TypeScript'],
+                  description: "Description of the new system...",
+                  longDescription: "Extended technical overview...",
+                  category: "Full Stack",
+                  tags: ["Next.js", "PostgreSQL", "TypeScript"],
                   featured: true,
-                  imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop',
-                  demoUrl: 'https://example.com',
-                  githubUrl: 'https://github.com',
+                  imageUrl:
+                    "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop",
+                  demoUrl: "https://example.com",
+                  githubUrl: "https://github.com",
                   stars: 10,
-                  metrics: '99.9% Uptime',
+                  metrics: "99.9% Uptime",
                   order: projects.length + 1,
                 };
                 setProjectImageFile(null);
@@ -1065,9 +1106,9 @@ export default function AdminPage() {
                       <button
                         onClick={async () => {
                           if (confirm(`Delete "${p.title}"?`)) {
-                            await fetch(`/api/projects/${p.id}`, { method: 'DELETE' });
+                            await fetch(`/api/projects/${p.id}`, { method: "DELETE" });
                             deleteProjectFromStore(p.id);
-                            showToast('Project deleted');
+                            showToast("Project deleted");
                           }
                         }}
                         className="p-1.5 rounded-lg hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
@@ -1084,7 +1125,7 @@ export default function AdminPage() {
                 <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/50">
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => moveItem(projects, index, -1, '/api/projects', setProjects, 'Project')}
+                      onClick={() => moveItem(projects, index, -1, "/api/projects", setProjects, "Project")}
                       disabled={index === 0}
                       className="p-1 rounded hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                       title="Move project up"
@@ -1092,7 +1133,7 @@ export default function AdminPage() {
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => moveItem(projects, index, 1, '/api/projects', setProjects, 'Project')}
+                      onClick={() => moveItem(projects, index, 1, "/api/projects", setProjects, "Project")}
                       disabled={index === projects.length - 1}
                       className="p-1 rounded hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                       title="Move project down"
@@ -1102,11 +1143,14 @@ export default function AdminPage() {
                     <span className="text-[10px] text-slate-400">Order {index + 1}</span>
                   </div>
                   <div className="flex flex-wrap gap-1 justify-end">
-                  {p.tags.slice(0, 4).map((t) => (
-                    <span key={t} className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-slate-600 border border-slate-200/50">
-                      {t}
-                    </span>
-                  ))}
+                    {p.tags.slice(0, 4).map((t) => (
+                      <span
+                        key={t}
+                        className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-slate-600 border border-slate-200/50"
+                      >
+                        {t}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1116,7 +1160,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 3: TECH STACK */}
-      {activeTab === 'tech' && (
+      {activeTab === "tech" && (
         <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
           <div className="flex items-center justify-between pb-4 border-b border-slate-200/60 mb-6">
             <div>
@@ -1125,19 +1169,19 @@ export default function AdminPage() {
             </div>
             <button
               onClick={() => {
-                const name = prompt('Skill Name (e.g. Next.js, Rust, Kafka):');
+                const name = prompt("Skill Name (e.g. Next.js, Rust, Kafka):");
                 if (!name) return;
-                const category = prompt('Category (Frontend, Backend, Practices, Tools):', 'Frontend') || 'Frontend';
-                fetch('/api/skills', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                const category = prompt("Category (Frontend, Backend, Practices, Tools):", "Frontend") || "Frontend";
+                fetch("/api/skills", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ name, category }),
                 })
                   .then((r) => r.json())
                   .then((d) => {
                     if (d.success) {
                       addSkill(d.skill);
-                      showToast('Skill added');
+                      showToast("Skill added");
                     }
                   });
               }}
@@ -1154,18 +1198,37 @@ export default function AdminPage() {
                 <h3 className="text-xs font-mono font-bold uppercase text-indigo-700 tracking-wider">Category order</h3>
                 <p className="text-[11px] text-slate-500 mt-1">This order is used on the homepage.</p>
               </div>
-              <button type="button" onClick={saveTechCategoryOrder} className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-[11px] font-semibold hover:bg-indigo-500 cursor-pointer">
+              <button
+                type="button"
+                onClick={saveTechCategoryOrder}
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-[11px] font-semibold hover:bg-indigo-500 cursor-pointer"
+              >
                 Save category order
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {techCategories.map((cat, index) => (
-                <div key={cat} className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-xs font-semibold text-slate-700">
-                  <span>{index + 1}. {cat}</span>
-                  <button onClick={() => moveTechCategory(index, -1)} disabled={index === 0} className="p-0.5 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed" title="Move category up">
+                <div
+                  key={cat}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-xs font-semibold text-slate-700"
+                >
+                  <span>
+                    {index + 1}. {cat}
+                  </span>
+                  <button
+                    onClick={() => moveTechCategory(index, -1)}
+                    disabled={index === 0}
+                    className="p-0.5 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Move category up"
+                  >
                     <ArrowUp className="w-3 h-3" />
                   </button>
-                  <button onClick={() => moveTechCategory(index, 1)} disabled={index === techCategories.length - 1} className="p-0.5 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed" title="Move category down">
+                  <button
+                    onClick={() => moveTechCategory(index, 1)}
+                    disabled={index === techCategories.length - 1}
+                    className="p-0.5 text-slate-400 hover:text-indigo-600 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                    title="Move category down"
+                  >
                     <ArrowDown className="w-3 h-3" />
                   </button>
                 </div>
@@ -1176,9 +1239,7 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {techCategories.map((cat) => (
               <div key={cat} className="space-y-3">
-                <h3 className="text-xs font-mono font-bold uppercase text-indigo-700 tracking-wider">
-                  {cat}
-                </h3>
+                <h3 className="text-xs font-mono font-bold uppercase text-indigo-700 tracking-wider">{cat}</h3>
                 <div className="flex flex-col gap-2">
                   {skills
                     .filter((s) => s.category.toLowerCase() === cat.toLowerCase())
@@ -1207,9 +1268,9 @@ export default function AdminPage() {
                           </button>
                           <button
                             onClick={async () => {
-                              await fetch(`/api/skills/${s.id}`, { method: 'DELETE' });
+                              await fetch(`/api/skills/${s.id}`, { method: "DELETE" });
                               deleteSkillFromStore(s.id);
-                              showToast('Skill removed');
+                              showToast("Skill removed");
                             }}
                             className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                             title="Delete skill"
@@ -1227,7 +1288,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 4: EXPERIENCE */}
-      {activeTab === 'experience' && (
+      {activeTab === "experience" && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -1238,12 +1299,12 @@ export default function AdminPage() {
               onClick={() => {
                 const newExp: ExperienceItem = {
                   id: `exp-${Date.now()}`,
-                  role: 'Lead Full Stack Engineer',
-                  company: 'Acme Systems',
-                  period: '2024 — Present',
-                  location: 'New York, NY',
-                  description: 'Spearheaded real-time collaboration architecture and optimized database query plans.',
-                  skills: ['Next.js', 'PostgreSQL', 'TypeScript', 'Zustand'],
+                  role: "Lead Full Stack Engineer",
+                  company: "Acme Systems",
+                  period: "2024 — Present",
+                  location: "New York, NY",
+                  description: "Spearheaded real-time collaboration architecture and optimized database query plans.",
+                  skills: ["Next.js", "PostgreSQL", "TypeScript", "Zustand"],
                   order: experiences.length + 1,
                 };
                 setEditingExperience(newExp);
@@ -1257,7 +1318,10 @@ export default function AdminPage() {
 
           <div className="space-y-4">
             {experiences.map((exp, index) => (
-              <div key={exp.id} className="liquid-glass-card rounded-2xl p-6 flex flex-col sm:flex-row justify-between gap-4">
+              <div
+                key={exp.id}
+                className="liquid-glass-card rounded-2xl p-6 flex flex-col sm:flex-row justify-between gap-4"
+              >
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-bold text-slate-900 text-base">{exp.role}</h3>
@@ -1266,12 +1330,13 @@ export default function AdminPage() {
                   <div className="text-xs font-mono text-slate-500 mb-2">
                     {exp.period} • {exp.location}
                   </div>
-                  <p className="text-xs text-slate-600 max-w-2xl leading-relaxed mb-3">
-                    {exp.description}
-                  </p>
+                  <p className="text-xs text-slate-600 max-w-2xl leading-relaxed mb-3">{exp.description}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {exp.skills.map((s) => (
-                      <span key={s} className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-slate-600 border border-slate-200/50">
+                      <span
+                        key={s}
+                        className="text-[10px] px-2 py-0.5 rounded bg-white/70 text-slate-600 border border-slate-200/50"
+                      >
                         {s}
                       </span>
                     ))}
@@ -1280,7 +1345,7 @@ export default function AdminPage() {
 
                 <div className="flex sm:flex-col items-center gap-2 self-start">
                   <button
-                    onClick={() => moveItem(experiences, index, -1, '/api/experience', setExperiences, 'Experience')}
+                    onClick={() => moveItem(experiences, index, -1, "/api/experience", setExperiences, "Experience")}
                     disabled={index === 0}
                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     title="Move experience up"
@@ -1288,7 +1353,7 @@ export default function AdminPage() {
                     <ArrowUp className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => moveItem(experiences, index, 1, '/api/experience', setExperiences, 'Experience')}
+                    onClick={() => moveItem(experiences, index, 1, "/api/experience", setExperiences, "Experience")}
                     disabled={index === experiences.length - 1}
                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     title="Move experience down"
@@ -1304,9 +1369,9 @@ export default function AdminPage() {
                   <button
                     onClick={async () => {
                       if (confirm(`Delete ${exp.role}?`)) {
-                        await fetch(`/api/experience/${exp.id}`, { method: 'DELETE' });
+                        await fetch(`/api/experience/${exp.id}`, { method: "DELETE" });
                         deleteExperienceFromStore(exp.id);
-                        showToast('Experience deleted');
+                        showToast("Experience deleted");
                       }
                     }}
                     className="p-2 rounded-xl hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
@@ -1321,7 +1386,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 5: EDUCATION */}
-      {activeTab === 'education' && (
+      {activeTab === "education" && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -1332,11 +1397,11 @@ export default function AdminPage() {
               onClick={() => {
                 const newEdu: EducationItem = {
                   id: `edu-${Date.now()}`,
-                  degree: 'B.S. in Computer Science',
-                  institution: 'University Name',
-                  period: '2016 — 2020',
-                  location: 'New York, NY',
-                  description: 'Honors, core subjects, algorithms, and systems engineering.',
+                  degree: "B.S. in Computer Science",
+                  institution: "University Name",
+                  period: "2016 — 2020",
+                  location: "New York, NY",
+                  description: "Honors, core subjects, algorithms, and systems engineering.",
                   order: educations.length + 1,
                 };
                 setEditingEducation(newEdu);
@@ -1350,7 +1415,10 @@ export default function AdminPage() {
 
           <div className="space-y-4">
             {educations.map((edu, index) => (
-              <div key={edu.id} className="liquid-glass-card rounded-2xl p-6 flex flex-col sm:flex-row justify-between gap-4">
+              <div
+                key={edu.id}
+                className="liquid-glass-card rounded-2xl p-6 flex flex-col sm:flex-row justify-between gap-4"
+              >
                 <div>
                   <h3 className="font-bold text-slate-900 text-base mb-1">{edu.degree}</h3>
                   <div className="text-xs font-semibold text-indigo-600 mb-1">{edu.institution}</div>
@@ -1364,7 +1432,7 @@ export default function AdminPage() {
 
                 <div className="flex sm:flex-col items-center gap-2 self-start">
                   <button
-                    onClick={() => moveItem(educations, index, -1, '/api/education', setEducations, 'Education')}
+                    onClick={() => moveItem(educations, index, -1, "/api/education", setEducations, "Education")}
                     disabled={index === 0}
                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     title="Move education up"
@@ -1372,7 +1440,7 @@ export default function AdminPage() {
                     <ArrowUp className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => moveItem(educations, index, 1, '/api/education', setEducations, 'Education')}
+                    onClick={() => moveItem(educations, index, 1, "/api/education", setEducations, "Education")}
                     disabled={index === educations.length - 1}
                     className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     title="Move education down"
@@ -1388,9 +1456,9 @@ export default function AdminPage() {
                   <button
                     onClick={async () => {
                       if (confirm(`Delete ${edu.degree}?`)) {
-                        await fetch(`/api/education/${edu.id}`, { method: 'DELETE' });
+                        await fetch(`/api/education/${edu.id}`, { method: "DELETE" });
                         deleteEducationFromStore(edu.id);
-                        showToast('Education deleted');
+                        showToast("Education deleted");
                       }
                     }}
                     className="p-2 rounded-xl hover:bg-rose-50 text-rose-600 transition-colors cursor-pointer"
@@ -1405,7 +1473,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 6: APPEARANCE */}
-      {activeTab === 'appearance' && (
+      {activeTab === "appearance" && (
         <div className="liquid-glass-card rounded-3xl p-6 sm:p-10">
           <div className="flex items-center gap-3 pb-4 border-b border-slate-200/60 mb-6">
             <Palette className="w-5 h-5 text-indigo-600" />
@@ -1476,7 +1544,7 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT 7: SEO & SOCIAL METADATA */}
-      {activeTab === 'seo' && (
+      {activeTab === "seo" && (
         <div className="space-y-8">
           <div className="flex items-center justify-between pb-4 border-b border-slate-200/60">
             <div>
@@ -1497,12 +1565,8 @@ export default function AdminPage() {
                 {/* Meta Title */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold uppercase text-slate-700">
-                      Meta Page Title *
-                    </label>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {seoForm.metaTitle.length}/60 chars
-                    </span>
+                    <label className="text-xs font-semibold uppercase text-slate-700">Meta Page Title *</label>
+                    <span className="text-[10px] font-mono text-slate-400">{seoForm.metaTitle.length}/60 chars</span>
                   </div>
                   <input
                     type="text"
@@ -1520,9 +1584,7 @@ export default function AdminPage() {
                 {/* Meta Description */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold uppercase text-slate-700">
-                      Meta Description *
-                    </label>
+                    <label className="text-xs font-semibold uppercase text-slate-700">Meta Description *</label>
                     <span className="text-[10px] font-mono text-slate-400">
                       {seoForm.metaDescription.length}/160 chars
                     </span>
@@ -1559,7 +1621,7 @@ export default function AdminPage() {
                     </label>
                     <input
                       type="url"
-                      value={seoForm.canonicalUrl || ''}
+                      value={seoForm.canonicalUrl || ""}
                       onChange={(e) => setSeoForm({ ...seoForm, canonicalUrl: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-indigo-500/40 outline-none"
                       placeholder="https://alexmiller.dev"
@@ -1573,7 +1635,7 @@ export default function AdminPage() {
                     </label>
                     <input
                       type="text"
-                      value={seoForm.twitterHandle || ''}
+                      value={seoForm.twitterHandle || ""}
                       onChange={(e) => setSeoForm({ ...seoForm, twitterHandle: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-indigo-500/40 outline-none"
                       placeholder="@alexmiller"
@@ -1601,15 +1663,13 @@ export default function AdminPage() {
                 <div className="p-5 rounded-2xl bg-indigo-50/50 border border-indigo-100">
                   <label className="block text-xs font-semibold uppercase text-indigo-950 mb-1 flex items-center justify-between">
                     <span>OpenGraph / Social Share Image (1200x630)</span>
-                    <span className="text-[10px] text-indigo-600 font-normal">
-                      Neon Object Storage
-                    </span>
+                    <span className="text-[10px] text-indigo-600 font-normal">Neon Object Storage</span>
                   </label>
 
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mt-2">
                     <input
                       type="text"
-                      value={seoForm.ogImageUrl || ''}
+                      value={seoForm.ogImageUrl || ""}
                       onChange={(e) => setSeoForm({ ...seoForm, ogImageUrl: e.target.value })}
                       placeholder="https://... or upload photo"
                       className="flex-1 px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:ring-2 focus:ring-indigo-500/40 outline-none"
@@ -1617,7 +1677,7 @@ export default function AdminPage() {
 
                     <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition-colors shadow-2xs">
                       <Upload className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>{ogImageFile ? ogImageFile.name : 'Upload OG Image'}</span>
+                      <span>{ogImageFile ? ogImageFile.name : "Upload OG Image"}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1671,14 +1731,14 @@ export default function AdminPage() {
                       G
                     </span>
                     <span className="text-[11px] text-slate-700 truncate">
-                      {seoForm.canonicalUrl || 'https://alexmiller.dev'}
+                      {seoForm.canonicalUrl || "https://alexmiller.dev"}
                     </span>
                   </div>
                   <h4 className="text-base text-[#1a0dab] font-medium hover:underline cursor-pointer leading-snug line-clamp-1">
-                    {seoForm.metaTitle || 'Portfolio Title'}
+                    {seoForm.metaTitle || "Portfolio Title"}
                   </h4>
                   <p className="text-xs text-[#4d5156] leading-relaxed line-clamp-2">
-                    {seoForm.metaDescription || 'Your portfolio meta description will appear here in search queries...'}
+                    {seoForm.metaDescription || "Your portfolio meta description will appear here in search queries..."}
                   </p>
                 </div>
               </div>
@@ -1694,21 +1754,20 @@ export default function AdminPage() {
                   <div className="relative w-full h-36 bg-slate-100 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={seoForm.ogImageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop'}
+                      src={
+                        seoForm.ogImageUrl ||
+                        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop"
+                      }
                       alt="OG Image Preview"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="p-3 bg-slate-50 border-t border-slate-200/60">
                     <div className="text-[10px] font-mono uppercase text-slate-400 mb-0.5">
-                      {seoForm.canonicalUrl?.replace(/https?:\/\//, '') || 'alexmiller.dev'}
+                      {seoForm.canonicalUrl?.replace(/https?:\/\//, "") || "alexmiller.dev"}
                     </div>
-                    <div className="text-xs font-bold text-slate-900 truncate">
-                      {seoForm.metaTitle}
-                    </div>
-                    <div className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
-                      {seoForm.metaDescription}
-                    </div>
+                    <div className="text-xs font-bold text-slate-900 truncate">{seoForm.metaTitle}</div>
+                    <div className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{seoForm.metaDescription}</div>
                   </div>
                 </div>
               </div>
@@ -1723,7 +1782,10 @@ export default function AdminPage() {
           <div className="relative w-full max-w-2xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
               <h3 className="font-bold text-slate-900 text-lg">Modify Project</h3>
-              <button onClick={() => setEditingProject(null)} className="p-1 rounded-full hover:bg-slate-100 cursor-pointer">
+              <button
+                onClick={() => setEditingProject(null)}
+                className="p-1 rounded-full hover:bg-slate-100 cursor-pointer"
+              >
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
@@ -1747,9 +1809,9 @@ export default function AdminPage() {
                     onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value as any })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                   >
-                      <option value="Full Stack">Full Stack</option>
+                    <option value="Full Stack">Full Stack</option>
                     <option value="Frontend">Frontend</option>
-                      <option value="Backend">Backend</option>
+                    <option value="Backend">Backend</option>
                     <option value="Distributed Systems">Distributed Systems</option>
                     <option value="AI / Creative">AI / Creative</option>
                   </select>
@@ -1759,7 +1821,7 @@ export default function AdminPage() {
                   <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Metrics / Tag</label>
                   <input
                     type="text"
-                    value={editingProject.metrics || ''}
+                    value={editingProject.metrics || ""}
                     onChange={(e) => setEditingProject({ ...editingProject, metrics: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                   />
@@ -1781,7 +1843,7 @@ export default function AdminPage() {
                 <div className="flex items-center gap-3">
                   <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-semibold cursor-pointer hover:bg-indigo-100">
                     <Upload className="w-4 h-4" />
-                    <span>{projectImageFile ? 'Choose another image' : 'Upload image'}</span>
+                    <span>{projectImageFile ? "Choose another image" : "Upload image"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -1793,11 +1855,18 @@ export default function AdminPage() {
                 </div>
                 {editingProject.imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={editingProject.imageUrl} alt="Current project" className="mt-3 h-24 w-40 rounded-xl object-cover border border-slate-200" />
+                  <img
+                    src={editingProject.imageUrl}
+                    alt="Current project"
+                    className="mt-3 h-24 w-40 rounded-xl object-cover border border-slate-200"
+                  />
                 )}
                 {projectImageProgress !== null && (
                   <div className="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                    <div className="bg-indigo-600 h-1.5 rounded-full transition-all" style={{ width: `${projectImageProgress}%` }} />
+                    <div
+                      className="bg-indigo-600 h-1.5 rounded-full transition-all"
+                      style={{ width: `${projectImageProgress}%` }}
+                    />
                   </div>
                 )}
               </div>
@@ -1807,7 +1876,7 @@ export default function AdminPage() {
                   <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Live Project URL</label>
                   <input
                     type="url"
-                    value={editingProject.demoUrl || ''}
+                    value={editingProject.demoUrl || ""}
                     onChange={(e) => setEditingProject({ ...editingProject, demoUrl: e.target.value })}
                     placeholder="https://your-project.com"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
@@ -1817,7 +1886,7 @@ export default function AdminPage() {
                   <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">GitHub URL</label>
                   <input
                     type="url"
-                    value={editingProject.githubUrl || ''}
+                    value={editingProject.githubUrl || ""}
                     onChange={(e) => setEditingProject({ ...editingProject, githubUrl: e.target.value })}
                     placeholder="https://github.com/username/repository"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
@@ -1826,11 +1895,15 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Tags (comma separated)</label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                  Tags (comma separated)
+                </label>
                 <input
                   type="text"
-                  value={editingProject.tags.join(', ')}
-                  onChange={(e) => setEditingProject({ ...editingProject, tags: e.target.value.split(',').map((s) => s.trim()) })}
+                  value={editingProject.tags.join(", ")}
+                  onChange={(e) =>
+                    setEditingProject({ ...editingProject, tags: e.target.value.split(",").map((s) => s.trim()) })
+                  }
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                 />
               </div>
@@ -1847,7 +1920,7 @@ export default function AdminPage() {
                     try {
                       let finalImageUrl = editingProject.imageUrl;
                       if (projectImageFile) {
-                        finalImageUrl = await uploadPortfolioFile(projectImageFile, 'project-photos', (progress) => {
+                        finalImageUrl = await uploadPortfolioFile(projectImageFile, "project-photos", (progress) => {
                           setProjectImageProgress(progress);
                         });
                       }
@@ -1859,31 +1932,31 @@ export default function AdminPage() {
                       };
                       const isNew = !projects.some((p) => p.id === editingProject.id);
                       if (isNew) {
-                        const res = await fetch('/api/projects', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
+                        const res = await fetch("/api/projects", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
                           body: JSON.stringify(projectPayload),
                         });
                         const d = await res.json();
-                        if (!d.success) throw new Error(d.error || 'Failed to create project');
+                        if (!d.success) throw new Error(d.error || "Failed to create project");
                         addProject(d.project);
                       } else {
                         const res = await fetch(`/api/projects/${editingProject.id}`, {
-                          method: 'PUT',
-                          headers: { 'Content-Type': 'application/json' },
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
                           body: JSON.stringify(projectPayload),
                         });
                         const d = await res.json();
-                        if (!d.success) throw new Error(d.error || 'Failed to update project');
+                        if (!d.success) throw new Error(d.error || "Failed to update project");
                         updateProjectInStore(d.project);
                       }
-                      showToast('Project saved to PostgreSQL');
+                      showToast("Project saved to PostgreSQL");
                       setEditingProject(null);
                       setProjectImageFile(null);
                       setProjectImageProgress(null);
                     } catch (error) {
-                      console.error('Error saving project:', error);
-                      showToast(error instanceof Error ? error.message : 'Failed to save project');
+                      console.error("Error saving project:", error);
+                      showToast(error instanceof Error ? error.message : "Failed to save project");
                     }
                   }}
                   className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md cursor-pointer"
@@ -1902,7 +1975,10 @@ export default function AdminPage() {
           <div className="relative w-full max-w-xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
               <h3 className="font-bold text-slate-900 text-lg">Modify Experience</h3>
-              <button onClick={() => setEditingExperience(null)} className="p-1 rounded-full hover:bg-slate-100 cursor-pointer">
+              <button
+                onClick={() => setEditingExperience(null)}
+                className="p-1 rounded-full hover:bg-slate-100 cursor-pointer"
+              >
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
@@ -1961,11 +2037,18 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Skills (comma separated)</label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                  Skills (comma separated)
+                </label>
                 <input
                   type="text"
-                  value={editingExperience.skills.join(', ')}
-                  onChange={(e) => setEditingExperience({ ...editingExperience, skills: e.target.value.split(',').map((s) => s.trim()) })}
+                  value={editingExperience.skills.join(", ")}
+                  onChange={(e) =>
+                    setEditingExperience({
+                      ...editingExperience,
+                      skills: e.target.value.split(",").map((s) => s.trim()),
+                    })
+                  }
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                 />
               </div>
@@ -1981,23 +2064,23 @@ export default function AdminPage() {
                   onClick={async () => {
                     const isNew = !experiences.some((e) => e.id === editingExperience.id);
                     if (isNew) {
-                      const res = await fetch('/api/experience', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                      const res = await fetch("/api/experience", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(editingExperience),
                       });
                       const d = await res.json();
                       if (d.success) addExperience(d.experience);
                     } else {
                       const res = await fetch(`/api/experience/${editingExperience.id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(editingExperience),
                       });
                       const d = await res.json();
                       if (d.success) updateExperienceInStore(d.experience);
                     }
-                    showToast('Experience updated');
+                    showToast("Experience updated");
                     setEditingExperience(null);
                   }}
                   className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md cursor-pointer"
@@ -2016,14 +2099,19 @@ export default function AdminPage() {
           <div className="relative w-full max-w-xl max-h-[calc(100vh-7rem)] overflow-y-auto liquid-glass-card bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-5">
               <h3 className="font-bold text-slate-900 text-lg">Modify Education</h3>
-              <button onClick={() => setEditingEducation(null)} className="p-1 rounded-full hover:bg-slate-100 cursor-pointer">
+              <button
+                onClick={() => setEditingEducation(null)}
+                className="p-1 rounded-full hover:bg-slate-100 cursor-pointer"
+              >
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Degree / Qualification</label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                  Degree / Qualification
+                </label>
                 <input
                   type="text"
                   value={editingEducation.degree}
@@ -2033,7 +2121,9 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Institution / University</label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                  Institution / University
+                </label>
                 <input
                   type="text"
                   value={editingEducation.institution}
@@ -2056,7 +2146,7 @@ export default function AdminPage() {
                   <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Location</label>
                   <input
                     type="text"
-                    value={editingEducation.location || ''}
+                    value={editingEducation.location || ""}
                     onChange={(e) => setEditingEducation({ ...editingEducation, location: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none"
                   />
@@ -2064,10 +2154,12 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">Description / Honors</label>
+                <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                  Description / Honors
+                </label>
                 <textarea
                   rows={2}
-                  value={editingEducation.description || ''}
+                  value={editingEducation.description || ""}
                   onChange={(e) => setEditingEducation({ ...editingEducation, description: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm outline-none resize-none"
                 />
@@ -2084,23 +2176,23 @@ export default function AdminPage() {
                   onClick={async () => {
                     const isNew = !educations.some((e) => e.id === editingEducation.id);
                     if (isNew) {
-                      const res = await fetch('/api/education', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                      const res = await fetch("/api/education", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(editingEducation),
                       });
                       const d = await res.json();
                       if (d.success) addEducation(d.education);
                     } else {
                       const res = await fetch(`/api/education/${editingEducation.id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(editingEducation),
                       });
                       const d = await res.json();
                       if (d.success) updateEducationInStore(d.education);
                     }
-                    showToast('Education saved');
+                    showToast("Education saved");
                     setEditingEducation(null);
                   }}
                   className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md cursor-pointer"

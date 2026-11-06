@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { usePortfolioStore } from '@/lib/store';
+import { useEffect } from "react";
+import { usePortfolioStore } from "@/lib/store";
 
 interface Props {
   initialColor: string;
@@ -17,7 +17,7 @@ export default function ThemeController({ initialColor }: Props) {
       return;
     }
 
-    document.documentElement.style.setProperty('--accent-color', accentColor);
+    document.documentElement.style.setProperty("--accent-color", accentColor);
   }, [accentColor, initialColor, setAccentColor]);
 
   return null;

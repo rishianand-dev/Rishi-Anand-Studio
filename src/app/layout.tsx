@@ -1,67 +1,64 @@
-import type { Metadata } from 'next';
-import './globals.css';
-import Navbar from '@/components/ui/Navbar';
-import Footer from '@/components/ui/Footer';
-import AmbientBackground from '@/components/ui/AmbientBackground';
-import ProjectModal from '@/components/ui/ProjectModal';
-import AdminDrawer from '@/components/ui/AdminDrawer';
-import ThemeController from '@/components/ThemeController';
-import { getProfile, getSeoSettings, getThemeSettings } from '@/lib/db';
+import type { Metadata } from "next";
+import "./globals.css";
+import Navbar from "@/components/ui/Navbar";
+import Footer from "@/components/ui/Footer";
+import AmbientBackground from "@/components/ui/AmbientBackground";
+import ProjectModal from "@/components/ui/ProjectModal";
+import AdminDrawer from "@/components/ui/AdminDrawer";
+import ThemeController from "@/components/ThemeController";
+import { getProfile, getSeoSettings, getThemeSettings } from "@/lib/db";
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoSettings();
-  const defaultUrl = 'https://alexmiller.dev';
-  const siteUrl = seo.canonicalUrl?.startsWith('http') ? seo.canonicalUrl : defaultUrl;
+  const defaultUrl = "https://alexmiller.dev";
+  const siteUrl = seo.canonicalUrl?.startsWith("http") ? seo.canonicalUrl : defaultUrl;
 
   return {
     title: seo.metaTitle,
     description: seo.metaDescription,
-    keywords: seo.keywords ? seo.keywords.split(',').map((k) => k.trim()) : undefined,
+    keywords: seo.keywords ? seo.keywords.split(",").map((k) => k.trim()) : undefined,
     metadataBase: new URL(siteUrl),
     alternates: {
-      canonical: '/',
+      canonical: "/",
     },
-    robots: seo.robots || 'index, follow',
+    robots: seo.robots || "index, follow",
     openGraph: {
       title: seo.metaTitle,
       description: seo.metaDescription,
       url: siteUrl,
-      siteName: 'Liquid Glass Portfolio',
+      siteName: "Liquid Glass Portfolio",
       images: [
         {
-          url: seo.ogImageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+          url:
+            seo.ogImageUrl ||
+            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
           width: 1200,
           height: 630,
           alt: seo.metaTitle,
         },
       ],
-      type: 'website',
+      type: "website",
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: seo.metaTitle,
       description: seo.metaDescription,
-      creator: seo.twitterHandle || '@alexmiller',
-      images: [seo.ogImageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop'],
+      creator: seo.twitterHandle || "@alexmiller",
+      images: [
+        seo.ogImageUrl ||
+          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
+      ],
     },
   };
 }
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [profile, theme] = await Promise.all([getProfile(), getThemeSettings()]);
 
   return (
-    <html
-      lang="en"
-      className="scroll-smooth"
-      style={{ '--accent-color': theme.accentColor } as React.CSSProperties}
-    >
+    <html lang="en" className="scroll-smooth" style={{ "--accent-color": theme.accentColor } as React.CSSProperties}>
       <body className="antialiased selection:text-white">
         <ThemeController initialColor={theme.accentColor} />
         <AmbientBackground />
