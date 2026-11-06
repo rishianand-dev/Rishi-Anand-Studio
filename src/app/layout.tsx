@@ -8,6 +8,8 @@ import AdminDrawer from '@/components/ui/AdminDrawer';
 import ThemeController from '@/components/ThemeController';
 import { getProfile, getSeoSettings, getThemeSettings } from '@/lib/db';
 
+export const dynamic = 'force-static';
+
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoSettings();
   const defaultUrl = 'https://alexmiller.dev';
@@ -55,7 +57,11 @@ export default async function RootLayout({
   const [profile, theme] = await Promise.all([getProfile(), getThemeSettings()]);
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html
+      lang="en"
+      className="scroll-smooth"
+      style={{ '--accent-color': theme.accentColor } as React.CSSProperties}
+    >
       <body className="antialiased selection:text-white">
         <ThemeController initialColor={theme.accentColor} />
         <AmbientBackground />

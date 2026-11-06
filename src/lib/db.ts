@@ -41,11 +41,6 @@ const TAGS = {
 
 const invalidate = (tag: string) => revalidateTag(tag);
 
-const invalidateTheme = () => {
-  invalidate(TAGS.theme);
-  revalidatePath('/', 'layout');
-};
-
 async function readThemeSettings(): Promise<ThemeSettingsData> {
   try {
     const theme = await prisma.themeSettings.findUnique({ where: { id: 'default-theme' } });
@@ -83,7 +78,6 @@ export async function updateThemeSettings(data: Partial<ThemeSettingsData>): Pro
     }
     memoryTheme = { ...memoryTheme, accentColor };
   }
-  invalidateTheme();
   return memoryTheme;
 }
 

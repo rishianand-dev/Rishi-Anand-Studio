@@ -12,12 +12,13 @@ export default function ThemeController({ initialColor }: Props) {
   const setAccentColor = usePortfolioStore((state) => state.setAccentColor);
 
   useEffect(() => {
-    setAccentColor(initialColor);
-  }, [initialColor, setAccentColor]);
+    if (accentColor !== initialColor) {
+      setAccentColor(initialColor);
+      return;
+    }
 
-  useEffect(() => {
     document.documentElement.style.setProperty('--accent-color', accentColor);
-  }, [accentColor]);
+  }, [accentColor, initialColor, setAccentColor]);
 
   return null;
 }
