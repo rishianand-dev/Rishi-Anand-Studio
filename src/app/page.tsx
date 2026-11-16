@@ -4,17 +4,24 @@ import AboutSection from '@/components/ui/AboutSection';
 import ExperienceSection from '@/components/ui/ExperienceSection';
 import ContactSection from '@/components/ui/ContactSection';
 import StoreHydrator from '@/components/StoreHydrator';
-import { getEducations, getExperiences, getProfile, getProjects, getSkills } from '@/lib/db';
+import {
+  getEducationsUncached,
+  getExperiencesUncached,
+  getProfileUncached,
+  getProjectsUncached,
+  getSkillsUncached,
+} from '@/lib/db';
 
-export const revalidate = 3600;
+// Always fetch fresh data from DB — no caching so admin edits reflect immediately
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const [projects, experiences, educations, skills, profile] = await Promise.all([
-    getProjects(),
-    getExperiences(),
-    getEducations(),
-    getSkills(),
-    getProfile(),
+    getProjectsUncached(),
+    getExperiencesUncached(),
+    getEducationsUncached(),
+    getSkillsUncached(),
+    getProfileUncached(),
   ]);
 
   return (

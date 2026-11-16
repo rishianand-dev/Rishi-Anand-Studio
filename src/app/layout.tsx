@@ -6,12 +6,17 @@ import AmbientBackground from "@/components/ui/AmbientBackground";
 import ProjectModal from "@/components/ui/ProjectModal";
 import AdminDrawer from "@/components/ui/AdminDrawer";
 import ThemeController from "@/components/ThemeController";
-import { getProfile, getSeoSettings, getThemeSettings } from "@/lib/db";
+import {
+  getProfileUncached,
+  getSeoSettingsUncached,
+  getThemeSettingsUncached,
+} from "@/lib/db";
 
-export const dynamic = "force-static";
+// Always read fresh data so admin edits (SEO, profile, theme) reflect immediately
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoSettings();
+  const seo = await getSeoSettingsUncached();
   const defaultUrl = "https://alexmiller.dev";
   const siteUrl = seo.canonicalUrl?.startsWith("http") ? seo.canonicalUrl : defaultUrl;
 
@@ -55,7 +60,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [profile, theme] = await Promise.all([getProfile(), getThemeSettings()]);
+  const [profile, theme] = await Promise.all([
+    getProfileUncached(),
+    getThemeSettingsUncached(),
+  ]);
 
   return (
     <html lang="en" className="scroll-smooth" style={{ "--accent-color": theme.accentColor } as React.CSSProperties}>

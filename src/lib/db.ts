@@ -117,6 +117,8 @@ export const getSeoSettings = unstable_cache(readSeoSettings, ["portfolio-seo-se
   tags: [TAGS.seo],
 });
 
+export const getSeoSettingsUncached = readSeoSettings;
+
 export async function updateSeoSettings(data: Partial<SeoSettingsData>): Promise<SeoSettingsData> {
   try {
     const current = await getSeoSettings();
@@ -207,6 +209,8 @@ async function readProfile(): Promise<ProfileData> {
 export const getProfile = unstable_cache(readProfile, ["portfolio-profile"], {
   tags: [TAGS.profile],
 });
+
+export const getProfileUncached = readProfile;
 
 export async function updateProfile(data: Partial<ProfileData>): Promise<ProfileData> {
   try {
@@ -324,6 +328,8 @@ export const getProjects = unstable_cache(readProjects, ["portfolio-projects"], 
   tags: [TAGS.projects],
 });
 
+export const getProjectsUncached = readProjects;
+
 export async function createProject(data: Omit<Project, "id" | "createdAt">): Promise<Project> {
   try {
     const created = await prisma.project.create({
@@ -418,6 +424,8 @@ export const getEducations = unstable_cache(readEducations, ["portfolio-educatio
   tags: [TAGS.education],
 });
 
+export const getEducationsUncached = readEducations;
+
 export async function createEducation(data: Omit<EducationItem, "id">): Promise<EducationItem> {
   try {
     const created = await prisma.education.create({
@@ -492,6 +500,8 @@ export const getSkills = unstable_cache(readSkills, ["portfolio-skills"], {
   tags: [TAGS.skills],
 });
 
+export const getSkillsUncached = readSkills;
+
 export async function createSkill(data: Omit<SkillItem, "id">): Promise<SkillItem> {
   try {
     const created = await prisma.skill.create({
@@ -561,6 +571,8 @@ async function readExperiences(): Promise<ExperienceItem[]> {
 export const getExperiences = unstable_cache(readExperiences, ["portfolio-experience"], {
   tags: [TAGS.experience],
 });
+
+export const getExperiencesUncached = readExperiences;
 
 export async function createExperience(data: Omit<ExperienceItem, "id">): Promise<ExperienceItem> {
   try {
